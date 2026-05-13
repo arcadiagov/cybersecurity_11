@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Awareness</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #101820, #1b2735);
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 60px auto;
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 42px;
+            color: #ff4d4d;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        p {
+            font-size: 20px;
+            line-height: 1.8;
+            color: #e0e0e0;
+        }
+
+        .highlight {
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        .link-grid {
+            margin-top: 35px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .malware-link {
+            background-color: #182635;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: 0.25s;
+            border: 1px solid #2f455c;
+        }
+
+        .malware-link:hover {
+            transform: translateY(-5px);
+            background-color: #22364b;
+        }
+
+        .malware-link a {
+            color: #66b3ff;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .tip-box {
+            margin-top: 40px;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-left: 5px solid #4da6ff;
+            padding: 25px;
+            border-radius: 6px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #9aa7b5;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>You Have Just Fallen Victim to Phishing</h1>
+
+        <p>
+            You have just experienced what is known as 
+            <span class="highlight">phishing</span>.
+        </p>
+
+        <p>
+            By pretending to be a reputable business organization and creating a sense of urgency with a time limit, attackers can convince victims to click dangerous links or download harmful files.
+        </p>
+
+        <p>
+            In a real cyberattack, clicking a phishing link could have resulted in the installation of:
+        </p>
+
+        <div class="link-grid">
+
+            <div class="malware-link">
+                <a href="virus.html">Virus</a>
+            </div>
+
+            <div class="malware-link">
+                <a href="ransomware.html">Ransomware</a>
+            </div>
+
+            <div class="malware-link">
+                <a href="spyware.html">Spyware</a>
+            </div>
+
+            <div class="malware-link">
+                <a href="worm.html">Worm</a>
+            </div>
+
+        </div>
+
+        <div class="tip-box">
+            <p>
+                <strong>Cybersecurity Tip:</strong><br><br>
+
+                Always verify email addresses before clicking on links or downloading attachments.
+                In this scenario, the sender claimed to be CIBC, but the email address was suspicious.
+            </p>
+
+            <p>
+                When in doubt, contact the company directly using a trusted phone number or official website instead of clicking links in the email.
+            </p>
+        </div>
+
+        <div class="footer">
+            Cybersecurity Awareness Simulation Project
+        </div>
+
+    </div>
+
+</body>
+</html>
