@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worm Simulation</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            background-color: #0b0b0b;
+            font-family: Consolas, monospace;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Overlay simulation */
+        #overlay {
+            position: fixed;
+            inset: 0;
+            background-color: black;
+            z-index: 9999;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        .terminal {
+            color: #00ff66;
+            font-size: 20px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .warning {
+            color: red;
+            font-size: 28px;
+            margin-bottom: 25px;
+            animation: flash 0.7s infinite;
+        }
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* Main lesson page */
+        .content {
+            display: none;
+            max-width: 1000px;
+            margin: 60px auto;
+            background-color: #151515;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(255,255,255,0.05);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .content h1 {
+            color: #ff5555;
+            font-size: 42px;
+            margin-bottom: 25px;
+        }
+
+        .content p {
+            color: #dddddd;
+            font-size: 21px;
+            line-height: 1.9;
+        }
+
+        .highlight {
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        .links {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: white;
+            background-color: #a30000;
+            padding: 14px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .links a:hover {
+            background-color: #d10000;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Fake worm activity overlay -->
+    <div id="overlay">
+
+        <div class="warning">
+            SYSTEM COMPROMISED
+        </div>
+
+        <div class="terminal" id="terminal-text">
+Initializing worm payload...
+
+Copying files...
+Injecting malicious code...
+Scanning connected devices...
+Overloading network traffic...
+Deleting temporary files...
+Replicating worm process...
+Accessing local programs...
+Modifying system directories...
+Disabling security protections...
+Corrupting active memory...
+Sending malicious packets...
+Replicating to external devices...
+Flooding server requests...
+Attempting privilege escalation...
+Replicating worm instances...
+Deleting restore points...
+Overloading CPU usage...
+Copying payload to startup folders...
+Compromising connected systems...
+        </div>
+
+    </div>
+
+    <!-- Main educational content -->
+    <div class="content" id="main-content">
+
+        <h1>Worm Malware Explained</h1>
+
+        <p>
+            A <span class="highlight">worm</span> is a type of malware that can rapidly spread and cause severe disruption once installed on a computer or network.
+        </p>
+
+        <p>
+            Worms are capable of copying themselves into other programs and systems automatically, often without the user realizing it.
+        </p>
+
+        <p>
+            They may overload servers, consume large amounts of system resources, spread across networks, and even crash computers or services.
+        </p>
+
+        <p>
+            Worms are commonly spread through phishing emails, infected downloads, malicious advertisements, or unsafe websites.
+        </p>
+
+        <p>
+            Always be cautious before clicking suspicious links or downloading unknown files from the internet.
+        </p>
+
+        <div class="links">
+
+            <a href="virus.html">Virus</a>
+
+            <a href="ransomware.html">Ransomware</a>
+
+            <a href="spyware.html">Spyware</a>
+
+        </div>
+
+        <div class="footer">
+            Cybersecurity Awareness Simulation Project
+        </div>
+
+    </div>
+
+    <script>
+
+        // Hide overlay after 10 seconds
+        setTimeout(() => {
+
+            document.getElementById("overlay").style.display = "none";
+
+            document.getElementById("main-content").style.display = "block";
+
+        }, 10000);
+
+    </script>
+
+</body>
+</html>
