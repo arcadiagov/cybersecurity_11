@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIBC Security Alert</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f1f3f4;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .email-wrapper {
+            max-width: 700px;
+            margin: 40px auto;
+            background-color: white;
+            border: 1px solid #dcdcdc;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .email-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #b30000;
+            letter-spacing: 1px;
+        }
+
+        .email-details {
+            margin-top: 18px;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        .email-details strong {
+            color: #222;
+        }
+
+        .email-body {
+            padding: 35px 30px;
+            color: #222;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .warning-box {
+            background-color: #fff5f5;
+            border-left: 4px solid #d60000;
+            padding: 18px;
+            margin: 25px 0;
+        }
+
+        .reset-button {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #c40000;
+            color: white;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .reset-button:hover {
+            background-color: #a10000;
+        }
+
+        .footer {
+            padding: 25px 30px;
+            background-color: #fafafa;
+            border-top: 1px solid #e5e5e5;
+            font-size: 13px;
+            color: #777;
+            line-height: 1.6;
+        }
+
+        .gmail-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0e1a0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="email-wrapper">
+
+        <div class="gmail-warning">
+            Be careful with this message. Gmail could not verify that this email actually came from CIBC.
+        </div>
+
+        <div class="email-header">
+            <div class="logo">CIBC</div>
+
+            <div class="email-details">
+                <strong>From:</strong> no-reply@gmail.com<br>
+                <strong>To:</strong> customer@email.com<br>
+                <strong>Subject:</strong> Urgent Security Notification<br>
+                <strong>Date:</strong> May 13, 2026
+            </div>
+        </div>
+
+        <div class="email-body">
+
+            <p>Hello Customer,</p>
+
+            <div class="warning-box">
+                There have been several failed password attempts detected on your online banking account.
+            </div>
+
+            <p>
+                To secure your account and prevent temporary suspension, please reset your password immediately by clicking the secure link below.
+            </p>
+
+            <a href="phishing_explination.html" class="reset-button">
+                Reset Your Password
+            </a>
+
+            <p style="margin-top: 35px;">
+                If you do not reset your password within 24 hours, access to your account may be restricted for security purposes.
+            </p>
+
+            <p>
+                Thank you,<br>
+                CIBC Fraud Prevention Team
+            </p>
+
+        </div>
+
+        <div class="footer">
+            This is an automated security message. Please do not reply to this email.<br><br>
+
+            Canadian Imperial Bank of Commerce (CIBC)<br>
+            © 2026 CIBC. All rights reserved.
+        </div>
+
+    </div>
+
+</body>
+</html>
