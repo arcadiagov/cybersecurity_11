@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ransomware Simulation</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #101010;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Fake file screen */
+        .desktop {
+            padding: 30px;
+        }
+
+        .folder-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .folder {
+            text-align: center;
+            color: #d6d6d6;
+            font-size: 15px;
+        }
+
+        .folder img {
+            width: 70px;
+            margin-bottom: 10px;
+        }
+
+        /* Popup overlay */
+        .popup {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: flashBg 0.7s infinite;
+        }
+
+        .popup-content {
+            width: 80%;
+            max-width: 850px;
+            background-color: #1a0000;
+            border: 5px solid red;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 40px red;
+            animation: flashBox 0.5s infinite;
+        }
+
+        .popup-content h1 {
+            font-size: 52px;
+            color: #ff2b2b;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .popup-content p {
+            font-size: 24px;
+            line-height: 1.8;
+        }
+
+        .countdown {
+            font-size: 40px;
+            color: #ff5555;
+            margin-top: 25px;
+            font-weight: bold;
+        }
+
+        @keyframes flashBox {
+            0% { opacity: 1; }
+            50% { opacity: 0.55; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes flashBg {
+            0% { background-color: rgba(0,0,0,0.95); }
+            50% { background-color: rgba(80,0,0,0.95); }
+            100% { background-color: rgba(0,0,0,0.95); }
+        }
+
+        /* Lesson section */
+        .lesson {
+            max-width: 1000px;
+            margin: 60px auto;
+            background-color: #181818;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.05);
+        }
+
+        .lesson h2 {
+            font-size: 42px;
+            color: #ff4d4d;
+            margin-bottom: 20px;
+        }
+
+        .lesson p {
+            font-size: 21px;
+            line-height: 1.9;
+            color: #dddddd;
+        }
+
+        .highlight {
+            color: #ff5a5a;
+            font-weight: bold;
+        }
+
+        .links {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: white;
+            background-color: #a30000;
+            padding: 14px 24px;
+            border-radius: 6px;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .links a:hover {
+            background-color: #d10000;
+        }
+
+        .footer {
+            text-align: center;
+            color: #888;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ransomware Popup -->
+    <div class="popup" id="popup">
+
+        <div class="popup-content">
+
+            <h1>FILES ENCRYPTED</h1>
+
+            <p>
+                Your files have been encrypted and locked.
+            </p>
+
+            <p>
+                To recover access to your files, pay
+                <span class="highlight">15 Bitcoin</span>
+                to:
+            </p>
+
+            <p style="color:#ff7b7b;">
+                malwarescammer8783789210938210918039@gmail.com
+            </p>
+
+            <p>
+                You have <span class="highlight">3 hours</span> to pay.
+            </p>
+
+            <p>
+                Every 3 hours, the ransom doubles.<br>
+                After 3 days, all files will be permanently deleted.
+            </p>
+
+            <div class="countdown">
+                SYSTEM LOCKED
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Fake file screen -->
+    <div class="desktop">
+
+        <h1 style="color:#d6d6d6;">My Files</h1>
+
+        <div class="folder-grid">
+
+            <div class="folder">
+                📁<br>Taxes
+            </div>
+
+            <div class="folder">
+                📁<br>Family Photos
+            </div>
+
+            <div class="folder">
+                📁<br>Passwords
+            </div>
+
+            <div class="folder">
+                📁<br>Work Documents
+            </div>
+
+            <div class="folder">
+                📁<br>School Assignments
+            </div>
+
+            <div class="folder">
+                📁<br>Vacation Photos
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Lesson -->
+    <div class="lesson">
+
+        <h2>Ransomware Explained</h2>
+
+        <p>
+            What you have just experienced is an example of
+            <span class="highlight">ransomware</span>.
+        </p>
+
+        <p>
+            After downloading malicious software onto a computer, attackers can encrypt files and lock users out of their own data.
+            Encryption means the files become unreadable unless they are unlocked with a special decryption key controlled by the attacker.
+        </p>
+
+        <p>
+            Many users and companies store important documents, photos, passwords, and financial records on their devices, which is why some victims choose to pay the ransom.
+        </p>
+
+        <p>
+            Malware is a major cybersecurity threat for businesses and organizations around the world, and ransomware attacks continue to increase every year.
+        </p>
+
+        <p>
+            Always double check the sender of emails and verify websites before downloading software or clicking suspicious links.
+        </p>
+
+        <div class="links">
+
+            <a href="spyware.html">Spyware</a>
+
+            <a href="worm.html">Worm</a>
+
+            <a href="virus.html">Virus</a>
+
+        </div>
+
+        <div class="footer">
+            Cybersecurity Awareness Simulation Project
+        </div>
+
+    </div>
+
+    <script>
+        // Hide popup after 20 seconds
+        setTimeout(() => {
+            document.getElementById("popup").style.display = "none";
+        }, 20000);
+    </script>
+
+</body>
+</html>
