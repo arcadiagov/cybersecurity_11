@@ -90,6 +90,26 @@
             border-bottom: 1px solid #f0e1a0;
             font-size: 14px;
         }
+        .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.spam-button {
+    background-color: #5f6368;
+    color: white;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.spam-button:hover {
+    background-color: #3c4043;
+}
     </style>
 </head>
 <body>
@@ -101,14 +121,22 @@
         </div>
 
         <div class="email-header">
-            <div class="logo">CIBC</div>
 
-            <div class="email-details">
-                <strong>From:</strong> no-reply@gmail.com<br>
-                <strong>To:</strong> customer@email.com<br>
-                <strong>Subject:</strong> Urgent Security Notification<br>
-                <strong>Date:</strong> May 13, 2026
-            </div>
+    <div class="top-bar">
+        <div class="logo">CIBC</div>
+
+        <a href="phishing_explination.html" class="spam-button">
+            Move to Spam
+        </a>
+    </div>
+
+    <div class="email-details">
+        <strong>From:</strong> no-reply@gmail.com<br>
+        <strong>To:</strong> customer@email.com<br>
+        <strong>Subject:</strong> Urgent Security Notification<br>
+        <strong>Date:</strong> May 13, 2026
+    </div>
+
         </div>
 
         <div class="email-body">
