@@ -3,57 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIBC Security Alert</title>
+    <title>Gmail Simulation</title>
 
     <style>
+
         body {
             margin: 0;
-            padding: 0;
             background-color: #f1f3f4;
             font-family: Arial, Helvetica, sans-serif;
         }
 
+        /* Gmail Top Bar */
+
+        .topbar {
+            background-color: white;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .gmail-logo {
+            font-size: 34px;
+            font-weight: bold;
+            color: #d93025;
+        }
+
+        /* Email Container */
+
         .email-wrapper {
-            max-width: 700px;
+            max-width: 850px;
             margin: 40px auto;
             background-color: white;
-            border: 1px solid #dcdcdc;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .email-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid #e5e5e5;
+            padding: 25px 30px;
+            border-bottom: 1px solid #eee;
+            position: relative;
         }
 
-        .logo {
-            font-size: 32px;
-            font-weight: bold;
-            color: #b30000;
-            letter-spacing: 1px;
+        .subject {
+            font-size: 28px;
+            color: #202124;
+            margin-bottom: 20px;
         }
 
-        .email-details {
-            margin-top: 18px;
-            font-size: 14px;
-            color: #444;
+        .sender-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sender-info {
+            color: #555;
             line-height: 1.8;
         }
 
-        .email-details strong {
+        .sender-info strong {
             color: #222;
         }
+
+        /* 3 dots menu */
+
+        .menu-container {
+            position: relative;
+        }
+
+        .menu-button {
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px 10px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .menu-button:hover {
+            background-color: #eee;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            width: 220px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+            z-index: 999;
+        }
+
+        .dropdown a,
+        .dropdown div {
+            display: block;
+            padding: 14px 18px;
+            color: #222;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .dropdown a:hover,
+        .dropdown div:hover {
+            background-color: #f1f3f4;
+        }
+
+        .menu-container:hover .dropdown {
+            display: block;
+        }
+
+        /* Email Body */
 
         .email-body {
             padding: 35px 30px;
+            font-size: 18px;
+            line-height: 1.9;
             color: #222;
-            line-height: 1.7;
-            font-size: 16px;
         }
 
         .warning-box {
-            background-color: #fff5f5;
-            border-left: 4px solid #d60000;
+            background-color: #fff4f4;
+            border-left: 4px solid #d93025;
             padding: 18px;
             margin: 25px 0;
         }
@@ -61,90 +140,157 @@
         .reset-button {
             display: inline-block;
             margin-top: 20px;
-            background-color: #c40000;
+            background-color: #d93025;
             color: white;
             text-decoration: none;
             padding: 14px 28px;
             border-radius: 4px;
             font-weight: bold;
-            transition: 0.2s;
         }
 
         .reset-button:hover {
-            background-color: #a10000;
+            background-color: #b42318;
+        }
+
+        /* Reply Box */
+
+        #reply-box {
+            display: none;
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            padding-top: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 160px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 16px;
+            resize: none;
+            box-sizing: border-box;
+        }
+
+        .send-button {
+            margin-top: 15px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .send-button:hover {
+            background-color: #1558b0;
+        }
+
+        /* Urgent Reply */
+
+        #urgent-email {
+            display: none;
+            margin-top: 35px;
+            background-color: #fff3cd;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        #urgent-email h3 {
+            margin-top: 0;
+            color: #d97706;
         }
 
         .footer {
             padding: 25px 30px;
             background-color: #fafafa;
-            border-top: 1px solid #e5e5e5;
-            font-size: 13px;
+            border-top: 1px solid #eee;
             color: #777;
-            line-height: 1.6;
+            font-size: 13px;
         }
 
-        .gmail-warning {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 12px 20px;
-            border-bottom: 1px solid #f0e1a0;
-            font-size: 14px;
-        }
-        .top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.spam-button {
-    background-color: #5f6368;
-    color: white;
-    text-decoration: none;
-    padding: 10px 18px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: bold;
-    transition: 0.2s;
-}
-
-.spam-button:hover {
-    background-color: #3c4043;
-}
     </style>
 </head>
 <body>
 
-    <div class="email-wrapper">
+    <!-- Gmail Header -->
 
-        <div class="gmail-warning">
-            Be careful with this message. Gmail could not verify that this email actually came from CIBC.
+    <div class="topbar">
+
+        <div class="gmail-logo">
+            Gmail
         </div>
+
+    </div>
+
+    <!-- Email -->
+
+    <div class="email-wrapper">
 
         <div class="email-header">
 
-    <div class="top-bar">
-        <div class="logo">CIBC</div>
+            <div class="subject">
+                Urgent Security Notification
+            </div>
 
-        <a href="phishing_explination.html" class="spam-button">
-            Move to Spam
-        </a>
-    </div>
+            <div class="sender-row">
 
-    <div class="email-details">
-        <strong>From:</strong> no-reply@gmail.com<br>
-        <strong>To:</strong> customer@email.com<br>
-        <strong>Subject:</strong> Urgent Security Notification<br>
-        <strong>Date:</strong> May 13, 2026
-    </div>
+                <div class="sender-info">
+
+                    <strong>CIBC Security</strong><br>
+
+                    From: no-reply@gmail.com<br>
+
+                    To: customer@email.com
+
+                </div>
+
+                <!-- Menu -->
+
+                <div class="menu-container">
+
+                    <div class="menu-button">
+                        ⋮
+                    </div>
+
+                    <div class="dropdown">
+
+                        <div onclick="showReply()">
+                            Reply
+                        </div>
+
+                        <a href="phishing_explination.html">
+                            Report as Phishing
+                        </a>
+
+                        <a href="phishing_explination.html">
+                            Move to Spam
+                        </a>
+
+                        <div onclick="alert('Forwarding blocked for security reasons.')">
+                            Forward
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
+
+        <!-- Email Body -->
 
         <div class="email-body">
 
             <p>Hello Customer,</p>
 
             <div class="warning-box">
+
                 There have been several failed password attempts detected on your online banking account.
+
             </div>
 
             <p>
@@ -155,8 +301,8 @@
                 Reset Your Password
             </a>
 
-            <p style="margin-top: 35px;">
-                If you do not reset your password within 24 hours, access to your account may be restricted for security purposes.
+            <p style="margin-top:35px;">
+                Failure to reset your password within 24 hours may result in restricted access to your account.
             </p>
 
             <p>
@@ -164,16 +310,80 @@
                 CIBC Fraud Prevention Team
             </p>
 
+            <!-- Reply -->
+
+            <div id="reply-box">
+
+                <h3>Reply</h3>
+
+                <textarea placeholder="Type your message..."></textarea>
+
+                <button class="send-button" onclick="sendReply()">
+                    Send
+                </button>
+
+            </div>
+
+            <!-- Urgent Follow-up -->
+
+            <div id="urgent-email">
+
+                <h3>URGENT FOLLOW-UP NOTICE</h3>
+
+                <p>
+                    Your account remains at risk.
+                </p>
+
+                <p>
+                    Multiple additional failed login attempts have been detected since your last interaction.
+                </p>
+
+                <p>
+                    Immediate password reset is required to prevent temporary account suspension.
+                </p>
+
+                <a href="phishing_explination.html" class="reset-button">
+                    Secure Account Now
+                </a>
+
+            </div>
+
         </div>
 
         <div class="footer">
-            This is an automated security message. Please do not reply to this email.<br><br>
 
-            Canadian Imperial Bank of Commerce (CIBC)<br>
-            © 2026 CIBC. All rights reserved.
+            Educational cybersecurity simulation only.<br>
+            Not affiliated with or endorsed by CIBC.
+
         </div>
 
     </div>
+
+    <script>
+
+        function showReply() {
+
+            document.getElementById("reply-box").style.display = "block";
+
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: "smooth"
+            });
+
+        }
+
+        function sendReply() {
+
+            document.getElementById("urgent-email").style.display = "block";
+
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: "smooth"
+            });
+
+        }
+
+    </script>
 
 </body>
 </html>
