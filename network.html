@@ -9,7 +9,7 @@
             margin: 0;
             background: #050505;
             overflow: hidden;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             color: white;
         }
 
@@ -36,25 +36,13 @@
 
         .overlay-box {
             width: 90%;
-            max-width: 800px;
+            max-width: 600px;
             background: #101010;
             border: 1px solid #333;
             border-radius: 12px;
             padding: 40px;
             text-align: center;
             box-shadow: 0 0 40px rgba(255,0,0,0.15);
-        }
-
-        .overlay-box h1 {
-            color: #ff4444;
-            margin-top: 0;
-            font-size: 42px;
-        }
-
-        .overlay-box p {
-            color: #ccc;
-            line-height: 1.8;
-            font-size: 17px;
         }
 
         .overlay-box button {
@@ -65,7 +53,7 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-weight: bold;
         }
 
         .hud {
@@ -83,15 +71,13 @@
         }
 
         .hud-box { text-align: center; }
-        .hud-title { color: #999; font-size: 14px; }
-        .hud-value { color: white; font-size: 28px; margin-top: 5px; }
-
-        .network { position: relative; width: 100vw; height: 100vh; }
+        .hud-title { color: #999; font-size: 12px; text-transform: uppercase; }
+        .hud-value { color: white; font-size: 24px; margin-top: 5px; font-weight: bold; }
 
         .node {
             position: absolute;
-            width: 110px;
-            height: 110px;
+            width: 115px; /* Slightly wider for longer names */
+            height: 115px;
             border-radius: 50%;
             background: #0f0f0f;
             border: 4px solid #00cc66;
@@ -99,80 +85,70 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
-            transition: 0.5s;
-            box-shadow: 0 0 20px rgba(0,255,100,0.2);
+            transition: 0.4s;
             z-index: 5;
             cursor: pointer;
+            box-sizing: border-box;
+            padding: 5px;
         }
 
-        .node .icon { font-size: 34px; }
-        .node .label { margin-top: 8px; font-size: 12px; text-align: center; }
+        .node .icon { font-size: 32px; }
+        .node .label { 
+            margin-top: 5px; 
+            font-size: 11px; 
+            text-align: center; 
+            font-weight: bold;
+            line-height: 1.2;
+        }
 
-        .safe { border-color: #00cc66; box-shadow: 0 0 20px rgba(0,255,100,0.2); }
-        .warning { border-color: orange; animation: pulse 1s infinite; }
-        .infected { border-color: red; background: #220000; animation: infectedPulse 0.7s infinite; }
-        .recovering { border-color: #0088ff; animation: pulse 0.5s infinite; }
+        .safe { border-color: #00cc66; box-shadow: 0 0 15px rgba(0,255,100,0.2); }
+        .warning { border-color: #ff9900; animation: pulse 0.8s infinite; }
+        .infected { border-color: #ff0000; background: #220000; animation: infectedPulse 0.6s infinite; }
+        .recovering { border-color: #0088ff; animation: pulse 0.4s infinite; }
 
         .line {
             position: absolute;
-            height: 4px;
-            background: rgba(255,255,255,0.08);
+            height: 3px;
+            background: rgba(255,255,255,0.1);
             transform-origin: left center;
             z-index: 1;
-            transition: background 0.3s;
+            transition: 0.3s;
         }
 
         .line.active {
-            background: red;
-            box-shadow: 0 0 15px red;
-            animation: lineFlash 0.4s infinite;
-        }
-
-        #alerts {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 380px;
-            z-index: 99999;
-        }
-
-        .alert {
-            background: rgba(30,0,0,0.95);
-            border-left: 5px solid red;
-            padding: 15px;
-            margin-top: 12px;
-            color: #ffcccc;
-            animation: slideIn 0.4s ease;
-            font-size: 14px;
+            background: #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+            animation: lineFlash 0.3s infinite;
         }
 
         #isolateBtn {
             background: #b30000;
             color: white;
             border: none;
-            padding: 14px 22px;
-            border-radius: 6px;
+            padding: 12px 20px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 15px;
-            transition: 0.2s;
+            min-width: 180px;
         }
 
-        #isolateBtn.active { background: #007a33; }
+        #isolateBtn.unblock { background: #007a33; }
 
-        .firewall-popup {
+        #alerts {
             position: fixed;
-            left: 20px;
             bottom: 20px;
-            width: 340px;
-            background: rgba(20,20,20,0.96);
-            border-left: 5px solid orange;
-            padding: 15px;
-            color: white;
-            font-size: 14px;
-            z-index: 999999;
-            animation: popupSlide 0.4s ease;
+            right: 20px;
+            width: 320px;
+            z-index: 99999;
+        }
+
+        .alert {
+            background: rgba(20,20,20,0.95);
+            border-left: 4px solid #ff4444;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 13px;
+            animation: slideIn 0.3s ease;
         }
 
         #system-banner {
@@ -180,52 +156,46 @@
             top: 100px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(120,0,0,0.92);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
+            background: rgba(180,0,0,0.9);
+            padding: 10px 25px;
+            border-radius: 5px;
             font-weight: bold;
             display: none;
-            z-index: 999999;
+            z-index: 999;
         }
 
-        .glitch { animation: screenGlitch 0.18s infinite; }
+        .glitch { animation: screenGlitch 0.15s infinite; }
 
-        @keyframes infectedPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        @keyframes lineFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes popupSlide { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes screenGlitch { 0% { transform: translate(0,0); } 20% { transform: translate(-2px,1px); } 40% { transform: translate(2px,-1px); } 100% { transform: translate(0,0); } }
+        @keyframes infectedPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        @keyframes lineFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        @keyframes slideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes screenGlitch { 0% { transform: translate(0,0); } 10% { transform: translate(-2px,1px); } 90% { transform: translate(2px,-1px); } }
     </style>
 </head>
 <body>
 
 <div id="overlay">
     <div class="overlay-box">
-        <h1>Educational Malware Spread Simulation</h1>
-        <p>This page demonstrates how worms and viruses may spread through connected devices.</p>
-        <button onclick="startSimulation()">Start Simulation</button>
+        <h1>Network Breach Simulation</h1>
+        <p>Infection spreads between connected nodes. Click <strong>Isolate</strong> to cut traffic, then click infected nodes to <strong>Sanitize</strong> them. If you unblock while threats remain, the spread will continue.</p>
+        <button onclick="startSimulation()">INITIATE NETWORK</button>
     </div>
 </div>
 
 <div class="hud">
-    <button id="isolateBtn" onclick="isolateNetwork()">ISOLATE DEVICES</button>
+    <button id="isolateBtn" onclick="toggleIsolation()">ISOLATE NETWORK</button>
     <div class="hud-box">
-        <div class="hud-title">Devices Infected</div>
+        <div class="hud-title">Infected</div>
         <div class="hud-value" id="infectedCount">0</div>
     </div>
     <div class="hud-box">
-        <div class="hud-title">Network Traffic</div>
-        <div class="hud-value" id="traffic">Normal</div>
+        <div class="hud-title">Health</div>
+        <div class="hud-value" id="healthStatus">100%</div>
     </div>
     <div class="hud-box">
-        <div class="hud-title">Threat Level</div>
+        <div class="hud-title">Threat</div>
         <div class="hud-value" id="threat">LOW</div>
-    </div>
-    <div class="hud-box">
-        <div class="hud-title">Malware Type</div>
-        <div class="hud-value">Worm.VX</div>
     </div>
 </div>
 
@@ -266,13 +236,30 @@
 <div id="alerts"></div>
 
 <script>
-let infected = 0;
+let infectedCount = 0;
 let networkIsolated = false;
+
+const connections = [
+    ['n1', 'n2', 'l1'],
+    ['n1', 'n3', 'l2'],
+    ['n2', 'n4', 'l3'],
+    ['n2', 'n5', 'l4'],
+    ['n4', 'n6', 'l5']
+];
 
 function startSimulation() {
     document.getElementById("overlay").style.display = "none";
     createLines();
-    startInfection();
+    infect('n1', "⚠️ Zero-day exploit detected on Office-PC-01");
+    setInterval(virusLogic, 2500);
+}
+
+function createLines() {
+    connect("l1", 240, 235, 575, 275);
+    connect("l2", 240, 235, 300, 535);
+    connect("l3", 575, 275, 755, 505);
+    connect("l4", 575, 275, 1010, 215);
+    connect("l5", 755, 505, 1060, 575);
 }
 
 function connect(lineId, x1, y1, x2, y2) {
@@ -285,69 +272,99 @@ function connect(lineId, x1, y1, x2, y2) {
     line.style.transform = `rotate(${angle}deg)`;
 }
 
-function createLines() {
-    connect("l1", 240, 235, 575, 275);
-    connect("l2", 240, 235, 300, 535);
-    connect("l3", 575, 275, 755, 505);
-    connect("l4", 575, 275, 1010, 215);
-    connect("l5", 755, 505, 1060, 575);
+function toggleIsolation() {
+    const btn = document.getElementById("isolateBtn");
+    networkIsolated = !networkIsolated;
+
+    if (networkIsolated) {
+        btn.innerText = "UNBLOCK NETWORK";
+        btn.classList.add("unblock");
+        document.querySelectorAll('.line').forEach(l => l.classList.remove('active'));
+        addAlert("🛡️ Firewall active. Connections severed.");
+    } else {
+        btn.innerText = "ISOLATE NETWORK";
+        btn.classList.remove("unblock");
+        addAlert("🌐 Network restored. Scanning for threats...");
+    }
 }
 
-// NEW FEATURE: Recovery Logic
+function virusLogic() {
+    if (networkIsolated) return;
+
+    connections.forEach(([fromId, toId, lineId]) => {
+        const fromNode = document.getElementById(fromId);
+        const toNode = document.getElementById(toId);
+
+        if (fromNode.classList.contains('infected') && toNode.classList.contains('safe')) {
+            activateLine(lineId);
+            setTimeout(() => {
+                if(!networkIsolated) infect(toId, `⚠️ Malware spread to ${toNode.querySelector('.label').innerText}`);
+            }, 1000);
+        } else if (toNode.classList.contains('infected') && fromNode.classList.contains('safe')) {
+            activateLine(lineId);
+            setTimeout(() => {
+                if(!networkIsolated) infect(fromId, `⚠️ Lateral movement to ${fromNode.querySelector('.label').innerText}`);
+            }, 1000);
+        }
+    });
+}
+
+function infect(nodeId, text) {
+    const node = document.getElementById(nodeId);
+    if (!node.classList.contains('safe')) return;
+
+    node.classList.remove('safe');
+    node.classList.add('warning');
+    addAlert(text);
+
+    setTimeout(() => {
+        if (node.classList.contains('warning')) {
+            node.classList.remove('warning');
+            node.classList.add('infected');
+            infectedCount++;
+            updateStats();
+        }
+    }, 1500);
+}
+
 function recoverNode(nodeId) {
     const node = document.getElementById(nodeId);
-    if(networkIsolated && node.classList.contains("infected")) {
-        node.classList.remove("infected");
-        node.classList.add("recovering");
-        addAlert("🛠️ Running antivirus scan on " + nodeId);
+    if (node.classList.contains('infected')) {
+        node.classList.remove('infected');
+        node.classList.add('recovering');
         
         setTimeout(() => {
-            node.classList.remove("recovering");
-            node.classList.add("safe");
-            infected = Math.max(0, infected - 1);
-            document.getElementById("infectedCount").innerText = infected;
-            updateThreat();
-            addAlert("✅ " + nodeId + " cleaned and restored.");
-            if(infected === 0) {
-                document.body.classList.remove("glitch");
-                showBanner("NETWORK FULLY SANITIZED");
-            }
+            node.classList.remove('recovering');
+            node.classList.add('safe');
+            infectedCount = Math.max(0, infectedCount - 1);
+            updateStats();
+            addAlert(`✅ ${node.querySelector('.label').innerText} sanitized.`);
         }, 2000);
     }
 }
 
-function infect(nodeId, alertText) {
-    if(networkIsolated) return; // FIX: Prevent logic from running if isolated
-
-    const node = document.getElementById(nodeId);
-    if(node.classList.contains("infected") || node.classList.contains("warning")) return;
-
-    node.classList.remove("safe");
-    node.classList.add("warning");
-    addAlert(alertText);
-    firewallPopup("⚠️ Suspicious outbound traffic: " + nodeId);
-
-    setTimeout(() => {
-        if(networkIsolated) return; // Double check if user pressed button during the 1.5s delay
-        node.classList.remove("warning");
-        node.classList.add("infected");
-        infected++;
-        document.getElementById("infectedCount").innerText = infected;
-        updateThreat();
-        
-        if(infected >= 3) document.body.classList.add("glitch");
-    }, 1500);
+function updateStats() {
+    document.getElementById("infectedCount").innerText = infectedCount;
+    const health = Math.round(((6 - infectedCount) / 6) * 100);
+    document.getElementById("healthStatus").innerText = health + "%";
+    
+    const threat = document.getElementById("threat");
+    if (infectedCount >= 4) {
+        threat.innerText = "CRITICAL";
+        document.body.classList.add("glitch");
+    } else if (infectedCount >= 2) {
+        threat.innerText = "HIGH";
+        document.body.classList.remove("glitch");
+    } else {
+        threat.innerText = "LOW";
+        document.body.classList.remove("glitch");
+    }
 }
 
-function updateThreat() {
-    const t = document.getElementById("threat");
-    const tr = document.getElementById("traffic");
-    if(networkIsolated) { t.innerText = "CONTAINED"; tr.innerText = "OFFLINE"; return; }
-    
-    if(infected >= 5) { t.innerText = "CRITICAL"; tr.innerText = "SATURATED"; }
-    else if(infected >= 3) { t.innerText = "HIGH"; tr.innerText = "ELEVATED"; }
-    else if(infected > 0) { t.innerText = "MEDIUM"; tr.innerText = "UNSTABLE"; }
-    else { t.innerText = "LOW"; tr.innerText = "NORMAL"; }
+function activateLine(id) {
+    if (!networkIsolated) {
+        document.getElementById(id).classList.add("active");
+    }
 }
 
 function addAlert(text) {
@@ -356,56 +373,7 @@ function addAlert(text) {
     div.className = "alert";
     div.innerHTML = text;
     alerts.prepend(div);
-    if(alerts.children.length > 5) alerts.lastChild.remove();
-}
-
-function activateLine(id) {
-    if(!networkIsolated) {
-        document.getElementById(id).classList.add("active");
-    }
-}
-
-function isolateNetwork() {
-    networkIsolated = true;
-    const btn = document.getElementById("isolateBtn");
-    btn.innerText = "NETWORK ISOLATED";
-    btn.classList.add("active");
-    document.getElementById("traffic").innerText = "BLOCKED";
-    
-    // FIX: Remove red lines upon isolation
-    document.querySelectorAll('.line').forEach(l => l.classList.remove('active'));
-    
-    showBanner("⚠️ EMERGENCY ISOLATION ACTIVE");
-    addAlert("🛡️ Traffic between nodes severed.");
-}
-
-function showBanner(text) {
-    const banner = document.getElementById("system-banner");
-    banner.innerText = text;
-    banner.style.display = "block";
-    setTimeout(() => { banner.style.display = "none"; }, 4000);
-}
-
-function firewallPopup(text) {
-    const popup = document.createElement("div");
-    popup.className = "firewall-popup";
-    popup.innerHTML = text;
-    document.body.appendChild(popup);
-    setTimeout(() => { popup.remove(); }, 5000);
-}
-
-function startInfection() {
-    // Helper to check isolation before firing
-    const schedule = (fn, delay) => {
-        setTimeout(() => { if(!networkIsolated) fn(); }, delay);
-    };
-
-    infect("n1", "⚠️ Malware detected: Office-PC-01");
-    schedule(() => { activateLine("l1"); infect("n2", "⚠️ Propagation: Finance-Server"); }, 3000);
-    schedule(() => { activateLine("l2"); infect("n3", "⚠️ Propagation: Employee-Phone"); }, 5500);
-    schedule(() => { activateLine("l3"); infect("n4", "⚠️ Propagation: Cloud-Storage"); }, 8000);
-    schedule(() => { activateLine("l4"); infect("n5", "⚠️ Propagation: HR-Laptop"); }, 10500);
-    schedule(() => { activateLine("l5"); infect("n6", "⚠️ Propagation: Network-Printer"); }, 13000);
+    if(alerts.children.length > 6) alerts.lastChild.remove();
 }
 </script>
 </body>
