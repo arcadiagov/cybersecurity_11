@@ -269,10 +269,8 @@
                             Move to Spam
                         </a>
 
-                       
                         <div onclick="showForward()">
                             Forward
-                            </div>
                         </div>
 
                     </div>
@@ -325,42 +323,44 @@
                 </button>
 
             </div>
-<!-- ADD THIS DIRECTLY BELOW THE REPLY BOX -->
 
-<div id="forward-box" style="display:none; margin-top:40px; border-top:1px solid #ddd; padding-top:30px;">
+            <!-- Forward Box -->
 
-    <h3>Forward Email</h3>
+            <div id="forward-box" style="display:none; margin-top:40px; border-top:1px solid #ddd; padding-top:30px;">
 
-    <select id="forward-select" style="
-        width:100%;
-        padding:14px;
-        font-size:16px;
-        border:1px solid #ccc;
-        border-radius:6px;
-        margin-bottom:20px;
-    ">
+                <h3>Forward Email</h3>
 
-        <option value="">Select Recipient</option>
+                <select id="forward-select" style="
+                    width:100%;
+                    padding:14px;
+                    font-size:16px;
+                    border:1px solid #ccc;
+                    border-radius:6px;
+                    margin-bottom:20px;
+                ">
 
-        <option value="good">
-            CIBC@cibc.ca
-        </option>
+                    <option value="">Select Recipient</option>
 
-        <option value="good">
-            ITsupport@it.ca
-        </option>
+                    <option value="good">
+                        CIBC@cibc.ca
+                    </option>
 
-        <option value="bad">
-            coworkers@gmail.com
-        </option>
+                    <option value="good">
+                        ITsupport@it.ca
+                    </option>
 
-    </select>
+                    <option value="bad">
+                        coworkers@gmail.com
+                    </option>
 
-    <button class="send-button" onclick="forwardEmail()">
-        Forward Email
-    </button>
+                </select>
 
-</div>
+                <button class="send-button" onclick="forwardEmail()">
+                    Forward Email
+                </button>
+
+            </div>
+
             <!-- Urgent Follow-up -->
 
             <div id="urgent-email">
@@ -419,45 +419,44 @@
             });
 
         }
-        <!-- ADD THIS TO THE BOTTOM OF YOUR EXISTING SCRIPT -->
 
-function showForward() {
+        function showForward() {
 
-    document.getElementById("forward-box").style.display = "block";
+            document.getElementById("forward-box").style.display = "block";
 
-    window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth"
-    });
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: "smooth"
+            });
 
-}
+        }
 
-function forwardEmail() {
+        function forwardEmail() {
 
-    const value =
-        document.getElementById("forward-select").value;
+            const value =
+                document.getElementById("forward-select").value;
 
-    if(value === "good") {
+            if(value === "good") {
 
-        window.location.href =
-            "phishing_explination_good_job.html";
+                window.location.href =
+                    "phishing_explination_good_job.html";
 
-    }
+            }
 
-    else if(value === "bad") {
+            else if(value === "bad") {
 
-        window.location.href =
-            "phishing_explination.html";
+                window.location.href =
+                    "phishing_explination.html";
 
-    }
+            }
 
-    else {
+            else {
 
-        alert("Please select a recipient.");
+                alert("Please select a recipient.");
 
-    }
+            }
 
-}
+        }
 
     </script>
 
