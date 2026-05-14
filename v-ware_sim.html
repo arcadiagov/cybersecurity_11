@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virus Simulation</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            background-color: #050505;
+            color: white;
+            overflow-x: hidden;
+            font-family: Consolas, monospace;
+        }
+
+        /* Fake Browser Tabs */
+
+        #fake-tabs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 42px;
+            background-color: #1e1e1e;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            z-index: 10000;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab {
+            background-color: #2a2a2a;
+            color: #ccc;
+            padding: 8px 18px;
+            margin-right: 6px;
+            border-radius: 6px 6px 0 0;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            background-color: #b00000;
+            color: white;
+        }
+
+        /* Overlay */
+
+        #overlay {
+            position: fixed;
+            inset: 0;
+            background-color: #020202;
+            z-index: 9999;
+            padding: 60px 30px 30px 30px;
+            overflow: hidden;
+        }
+
+        .top-status {
+            margin-bottom: 30px;
+        }
+
+        .status-title {
+            color: #ff2b2b;
+            font-size: 34px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            animation: flash 0.8s infinite;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 28px;
+            background-color: #111;
+            border: 2px solid #333;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(to right, #ff0000, #ff5a5a);
+            transition: width 0.4s linear;
+        }
+
+        .progress-text {
+            margin-top: 12px;
+            color: #cccccc;
+            font-size: 20px;
+        }
+
+        .terminal-window {
+            background-color: #050505;
+            border: 2px solid #222;
+            padding: 20px;
+            height: 65vh;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(255,0,0,0.2);
+        }
+
+        .terminal-header {
+            color: #888;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .terminal {
+            color: #00ff66;
+            font-size: 18px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            height: 90%;
+        }
+
+        .message {
+            animation: fadeIn 0.15s;
+        }
+
+        /* Notifications */
+
+        #notification-container {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 10001;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .notification {
+            width: 320px;
+            background-color: #202020;
+            border-left: 5px solid red;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s ease;
+            font-family: Arial, sans-serif;
+        }
+
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #ff4d4d;
+        }
+
+        .notification-text {
+            font-size: 14px;
+            color: #ddd;
+        }
+
+        /* Antivirus Warning */
+
+        #antivirus-warning {
+            position: fixed;
+            top: 55px;
+            right: 20px;
+            background-color: #7a0000;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 6px;
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            z-index: 10001;
+            animation: flashWarning 1s infinite;
+            box-shadow: 0 0 20px rgba(255,0,0,0.4);
+        }
+
+        /* Educational Content */
+
+        .content {
+            display: none;
+            max-width: 1000px;
+            margin: 80px auto;
+            background-color: #151515;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(255,255,255,0.05);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .content h1 {
+            color: #ff5555;
+            font-size: 42px;
+            margin-bottom: 25px;
+        }
+
+        .content p {
+            font-size: 21px;
+            line-height: 1.9;
+            color: #dddddd;
+        }
+
+        .highlight {
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        .links {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: white;
+            background-color: #a30000;
+            padding: 14px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .links a:hover {
+            background-color: #d10000;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Animations */
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes flashWarning {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes flickerScreen {
+            0% { opacity: 1; }
+            50% { opacity: 0.96; }
+            100% { opacity: 1; }
+        }
+
+        body.flicker {
+            animation: flickerScreen 0.08s infinite;
+        }
+
+    </style>
+</head>
+<body class="flicker">
+
+    <!-- Fake Browser Tabs -->
+
+    <div id="fake-tabs">
+
+        <div class="tab active">⚠ Security Warning</div>
+        <div class="tab">Windows Defender</div>
+        <div class="tab">Virus Detected</div>
+        <div class="tab">System Alert</div>
+
+    </div>
+
+    <!-- Notifications -->
+
+    <div id="notification-container"></div>
+
+    <!-- Antivirus Warning -->
+
+    <div id="antivirus-warning">
+        Windows Defender Firewall has been disabled.
+    </div>
+
+    <!-- Overlay -->
+
+    <div id="overlay">
+
+        <div class="top-status">
+
+            <div class="status-title">
+                SYSTEM SECURITY BREACH DETECTED
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <div class="progress-text" id="progress-text">
+                Gaining System Control...
+            </div>
+
+        </div>
+
+        <div class="terminal-window">
+
+            <div class="terminal-header">
+                SYSTEM EXECUTION CONSOLE
+            </div>
+
+            <div class="terminal" id="terminal"></div>
+
+        </div>
+
+    </div>
+
+    <!-- Educational Content -->
+
+    <div class="content" id="main-content">
+
+        <h1>Virus Malware Explained</h1>
+
+        <p>
+            What you have just experienced is an example of what a
+            <span class="highlight">computer virus</span>
+            may attempt to do to a device.
+        </p>
+
+        <p>
+            Viruses are often designed to spread themselves into files, programs, or systems while causing as much disruption and destruction as possible.
+        </p>
+
+        <p>
+            A virus may rename or delete files, corrupt programs, spread itself to email contacts, steal information, or damage important operating system components.
+        </p>
+
+        <p>
+            Some viruses are designed purely for destruction, while others may focus on stealing personal or financial information.
+        </p>
+
+        <p>
+            If you suspect your computer has been infected by a virus, disconnect from Wi-Fi or the network immediately to help prevent the malware from spreading to other devices.
+        </p>
+
+        <p>
+            Then contact a reputable IT department or cybersecurity professional for assistance removing the malware safely.
+        </p>
+
+        <div class="links">
+
+            <a href="worm.html">Worm</a>
+
+            <a href="ransomware.html">Ransomware</a>
+
+            <a href="spyware.html">Spyware</a>
+
+        </div>
+
+        <div class="footer">
+            Cybersecurity Awareness Simulation Project
+        </div>
+
+    </div>
+
+    <script>
+
+        const messages = [
+
+            "[BOOT] Establishing unauthorized system session...",
+            "[BOOT] Bypassing local firewall protections...",
+            "[SUCCESS] Security permissions elevated.",
+
+            "[FILE] Renaming: taxes2026.xlsx -> encrypted_taxes.lock",
+            "[FILE] Renaming: family_photos.zip -> corrupted_media.vrs",
+            "[FILE] Renaming: banking_info.txt -> hidden_data.sys",
+            "[FILE] Renaming: passwords.docx -> compromised_credentials.tmp",
+
+            "[DELETE] Removing recovery snapshot...",
+            "[DELETE] Deleting backup archive...",
+            "[DELETE] Deleting restore environment...",
+
+            "[MAIL] Accessing Outlook mail session...",
+            "[MAIL] Reading stored contacts...",
+            "[MAIL] Exporting contact database...",
+
+            "[EMAIL] Sending infected attachment: invoice_update.zip",
+            "[EMAIL] Sender spoofed as: support@cibc-alerts.com",
+            "[EMAIL] Sent to: michael.andrews@outlook.com",
+
+            "[EMAIL] Sending infected attachment: payroll_report.zip",
+            "[EMAIL] Sender spoofed as: admin@secure-mailverify.net",
+            "[EMAIL] Sent to: support@helpdesk-mail.net",
+
+            "[UPLOAD] Uploading browser credentials...",
+            "[UPLOAD] Uploading stored passwords...",
+            "[UPLOAD] Uploading autofill payment information...",
+
+            "[REPLICATE] Copying payload to Downloads directory...",
+            "[REPLICATE] Copying payload to startup folders...",
+            "[REPLICATE] Copying payload to USB devices...",
+
+            "[WARNING] System stability compromised...",
+            "[WARNING] CPU usage exceeding limits...",
+
+            "[SUCCESS] SYSTEM CONTROL GAINED."
+
+        ];
+
+        const terminal = document.getElementById("terminal");
+        const progressBar = document.getElementById("progress-bar");
+        const progressText = document.getElementById("progress-text");
+
+        let index = 0;
+
+        function addMessage() {
+
+            if(index < messages.length) {
+
+                const line = document.createElement("div");
+
+                line.className = "message";
+
+                line.textContent = messages[index];
+
+                terminal.appendChild(line);
+
+                terminal.scrollTop = terminal.scrollHeight;
+
+                let progress = ((index + 1) / messages.length) * 100;
+
+                progressBar.style.width = progress + "%";
+
+                if(progress < 100) {
+                    progressText.textContent = "Gaining System Control...";
+                } else {
+                    progressText.textContent = "SYSTEM CONTROL GAINED";
+                }
+
+                index++;
+
+            }
+
+        }
+
+        const interval = setInterval(addMessage, 500);
+
+        // Notifications
+
+        const notifications = [
+
+            {
+                title: "Windows Security",
+                text: "Unauthorized administrator access detected."
+            },
+
+            {
+                title: "System Warning",
+                text: "Suspicious outbound network activity identified."
+            },
+
+            {
+                title: "Windows Defender",
+                text: "Real-time protection disabled."
+            },
+
+            {
+                title: "Critical Alert",
+                text: "Sensitive files may have been compromised."
+            },
+
+            {
+                title: "Email Security",
+                text: "Mass outbound emails detected from this device."
+            }
+
+        ];
+
+        const container = document.getElementById("notification-container");
+
+        function createNotification(title, text) {
+
+            const note = document.createElement("div");
+
+            note.className = "notification";
+
+            note.innerHTML = `
+                <div class="notification-title">${title}</div>
+                <div class="notification-text">${text}</div>
+            `;
+
+            container.appendChild(note);
+
+            setTimeout(() => {
+                note.remove();
+            }, 4000);
+
+        }
+
+        let notificationIndex = 0;
+
+        const notificationInterval = setInterval(() => {
+
+            if(notificationIndex < notifications.length) {
+
+                createNotification(
+                    notifications[notificationIndex].title,
+                    notifications[notificationIndex].text
+                );
+
+                notificationIndex++;
+
+            }
+
+        }, 2000);
+
+        // Browser Tabs Animation
+
+        const tabs = document.querySelectorAll(".tab");
+
+        let activeTab = 0;
+
+        setInterval(() => {
+
+            tabs.forEach(tab => tab.classList.remove("active"));
+
+            tabs[activeTab].classList.add("active");
+
+            activeTab++;
+
+            if(activeTab >= tabs.length) {
+                activeTab = 0;
+            }
+
+        }, 1000);
+
+        // End Overlay
+
+        setTimeout(() => {
+
+            clearInterval(interval);
+
+            clearInterval(notificationInterval);
+
+            document.getElementById("overlay").style.display = "none";
+
+            document.getElementById("fake-tabs").style.display = "none";
+
+            document.getElementById("antivirus-warning").style.display = "none";
+
+            document.getElementById("main-content").style.display = "block";
+
+        }, 15000);
+
+    </script>
+
+</body>
+</html>
