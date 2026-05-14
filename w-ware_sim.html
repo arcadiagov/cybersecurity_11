@@ -105,44 +105,80 @@
     animation: glitch 0.15s infinite;
 }
 
-@keyframes glitch {
+/* Screen shake for “system stress” */
+@keyframes shake {
     0% { transform: translate(0,0); }
-    20% { transform: translate(-1px,1px); }
-    40% { transform: translate(1px,-1px); }
-    60% { transform: translate(-1px,-1px); }
-    80% { transform: translate(1px,1px); }
+    25% { transform: translate(2px,-2px); }
+    50% { transform: translate(-2px,2px); }
+    75% { transform: translate(2px,2px); }
     100% { transform: translate(0,0); }
 }
 
-.alert {
+.shake {
+    animation: shake 0.15s infinite;
+}
+
+/* Scanline effect (old terminal realism) */
+#overlay::before {
+    content: "";
     position: absolute;
-    top: 20px;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03),
+        rgba(255,255,255,0.03) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+    pointer-events: none;
+}
+
+/* Fake system toast notifications */
+.toast {
+    position: fixed;
     right: 20px;
-    background: #1a0000;
-    border: 1px solid red;
-    color: red;
-    padding: 10px 15px;
-    font-size: 14px;
-    display: none;
+    bottom: 20px;
+    background: #111;
+    border-left: 4px solid red;
+    padding: 12px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 0.4s ease;
     z-index: 10000;
 }
 
-.progress-bar {
-    height: 6px;
-    width: 100%;
-    background: #330000;
-    margin-top: 10px;
-    overflow: hidden;
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.progress {
+/* Fake progress HUD */
+.hud {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 14px;
+    color: #00ff66;
+}
+
+.bar {
+    width: 260px;
+    height: 6px;
+    background: #222;
+    margin-top: 5px;
+}
+
+.bar-fill {
     height: 100%;
     width: 0%;
     background: red;
-    animation: load 10s linear forwards;
+    animation: fill 10s linear forwards;
 }
 
-@keyframes load {
+@keyframes fill {
     from { width: 0%; }
     to { width: 100%; }
 }
@@ -155,7 +191,7 @@
 
     <!-- Fake worm activity overlay -->
     <div id="overlay">
-
+<div id="toasts"></div>
         <div class="warning">
             SYSTEM COMPROMISED
         </div>
@@ -229,66 +265,83 @@ Compromising connected systems...
 
    
 
-      <script>
+  <script>
 
 const overlay = document.getElementById("overlay");
 const main = document.getElementById("main-content");
 const terminal = document.getElementById("terminal-text");
+const toasts = document.getElementById("toasts");
 
 const lines = terminal.innerText.split("\n");
 terminal.innerText = "";
 
 let i = 0;
 
-// TYPEWRITER EFFECT (makes logs feel real)
+/* TYPEWRITER (more chaotic realism) */
 function typeLine() {
 
     if (i < lines.length) {
         terminal.innerText += lines[i] + "\n";
         i++;
 
-        // random speed variation = realism
-        setTimeout(typeLine, Math.random() * 300 + 100);
+        // jitter timing = malware-like instability
+        let delay = Math.random() * 250 + 60;
+        setTimeout(typeLine, delay);
     }
 }
 
 typeLine();
 
-// Fake alert popup bursts
-const alertBox = document.getElementById("alertBox");
+/* REALISTIC SYSTEM TOASTS */
+const messages = [
+    "Network anomaly detected",
+    "Replicating process across system memory",
+    "Suspicious file modification detected",
+    "Background service spawned unexpectedly",
+    "High CPU usage from unknown process",
+    "System registry access attempt detected"
+];
 
-setTimeout(() => {
-    alertBox.style.display = "block";
-}, 2000);
+function showToast(text, delay) {
 
-setTimeout(() => {
-    alertBox.style.display = "none";
-}, 5000);
+    setTimeout(() => {
 
-setTimeout(() => {
-    alertBox.style.display = "block";
-    alertBox.innerText = "⚠ Unauthorized replication detected";
-}, 7000);
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerText = text;
 
-setTimeout(() => {
-    alertBox.style.display = "none";
-}, 9000);
+        toasts.appendChild(toast);
 
-// Screen glitch effect
+        setTimeout(() => toast.classList.add("show"), 50);
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
+
+    }, delay);
+}
+
+/* staggered alerts */
+messages.forEach((msg, index) => {
+    showToast(msg, index * 1200 + 2000);
+});
+
+/* escalation shake effect */
 setTimeout(() => {
-    overlay.classList.add("glitch");
+    overlay.classList.add("shake");
 }, 4000);
 
-// REMOVE OVERLAY (your original timing kept but smoother)
+/* fade-out instead of instant kill */
 setTimeout(() => {
 
+    overlay.style.transition = "opacity 2s ease";
     overlay.style.opacity = "0";
-    overlay.style.transition = "opacity 1.5s ease";
 
     setTimeout(() => {
         overlay.style.display = "none";
         main.style.display = "block";
-    }, 1500);
+    }, 2000);
 
 }, 10000);
 
