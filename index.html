@@ -30,6 +30,27 @@
             color: #d93025;
         }
 
+        /* External Email Warning Banner (FIXED) */
+
+        .security-banner {
+            background-color: #fef7e0;
+            border-bottom: 1px solid #f1e0a3;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #5f4b00;
+        }
+
+        .banner-icon {
+            font-size: 18px;
+        }
+
+        .banner-text {
+            line-height: 1.4;
+        }
+
         /* Email Container */
 
         .email-wrapper {
@@ -210,55 +231,60 @@
             color: #777;
             font-size: 13px;
         }
-#edu-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.92);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999999;
-}
 
-.edu-box {
-    background: #ffffff;
-    width: 90%;
-    max-width: 600px;
-    padding: 35px;
-    border-radius: 10px;
-    text-align: center;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-}
+        #edu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+        }
 
-.edu-box h1 {
-    margin-top: 0;
-    color: #d93025;
-}
+        .edu-box {
+            background: #ffffff;
+            width: 90%;
+            max-width: 600px;
+            padding: 35px;
+            border-radius: 10px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
 
-.edu-box p {
-    font-size: 16px;
-    color: #333;
-    line-height: 1.6;
-}
+        .edu-box h1 {
+            margin-top: 0;
+            color: #d93025;
+        }
 
-.edu-box button {
-    margin-top: 20px;
-    padding: 12px 24px;
-    background: #1a73e8;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-}
+        .edu-box p {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+        }
 
-.edu-box button:hover {
-    background: #1558b0;
-}
+        .edu-box button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .edu-box button:hover {
+            background: #1558b0;
+        }
+
     </style>
 </head>
+
 <body>
+
+<!-- EDUCATIONAL OVERLAY -->
 <div id="edu-overlay">
 
     <div class="edu-box">
@@ -284,65 +310,56 @@
     </div>
 
 </div>
-    <!-- Gmail Header -->
 
-    <div class="topbar">
+<!-- Gmail Header -->
+<div class="topbar">
+    <div class="gmail-logo">Gmail</div>
+</div>
 
-        <div class="gmail-logo">
-            Gmail
-        </div>
+<!-- FIXED BANNER (NOW OUTSIDE TOPBAR) -->
+<div class="security-banner">
 
+    <div class="banner-icon">⚠️</div>
+
+    <div class="banner-text">
+        External email warning: This message was sent from outside your organization.
+        Be cautious with links and attachments.
     </div>
 
-    <!-- Email -->
+</div>
 
-    <div class="email-wrapper">
+<!-- Email -->
+<div class="email-wrapper">
 
-        <div class="email-header">
+    <div class="email-header">
 
-            <div class="subject">
-                Urgent Security Notification
+        <div class="subject">
+            Urgent Security Notification
+        </div>
+
+        <div class="sender-row">
+
+            <div class="sender-info">
+
+                <strong>CIBC Security</strong><br>
+                From: no-reply@gmail.com<br>
+                To: customer@email.com
+
             </div>
 
-            <div class="sender-row">
+            <div class="menu-container">
 
-                <div class="sender-info">
+                <div class="menu-button">⋮</div>
 
-                    <strong>CIBC Security</strong><br>
+                <div class="dropdown">
 
-                    From: no-reply@gmail.com<br>
+                    <div onclick="showReply()">Reply</div>
 
-                    To: customer@email.com
+                    <a href="phishing_explination_good_job.html">Report as Phishing</a>
 
-                </div>
+                    <a href="phishing_explination_good_job.html">Move to Spam</a>
 
-                <!-- Menu -->
-
-                <div class="menu-container">
-
-                    <div class="menu-button">
-                        ⋮
-                    </div>
-
-                    <div class="dropdown">
-
-                        <div onclick="showReply()">
-                            Reply
-                        </div>
-
-                        <a href="phishing_explination_good_job.html">
-                            Report as Phishing
-                        </a>
-
-                        <a href="phishing_explination_good_job.html">
-                            Move to Spam
-                        </a>
-
-                        <div onclick="showForward()">
-                            Forward
-                        </div>
-
-                    </div>
+                    <div onclick="showForward()">Forward</div>
 
                 </div>
 
@@ -350,188 +367,101 @@
 
         </div>
 
-        <!-- Email Body -->
+    </div>
 
-        <div class="email-body">
+    <div class="email-body">
 
-            <p>Hello Customer,</p>
+        <p>Hello Customer,</p>
 
-            <div class="warning-box">
-
-                There have been several failed password attempts detected on your online banking account.
-
-            </div>
-
-            <p>
-                To secure your account and prevent temporary suspension, please reset your password immediately by clicking the secure link below.
-            </p>
-
-            <a href="phishing_explination.html" class="reset-button">
-                Reset Your Password
-            </a>
-
-            <p style="margin-top:35px;">
-                Failure to reset your password within 24 hours may result in restricted access to your account.
-            </p>
-
-            <p>
-                Thank you,<br>
-                CIBC Fraud Prevention Team
-            </p>
-
-            <!-- Reply -->
-
-            <div id="reply-box">
-
-                <h3>Reply</h3>
-
-                <textarea placeholder="Type your message..."></textarea>
-
-                <button class="send-button" onclick="sendReply()">
-                    Send
-                </button>
-
-            </div>
-
-            <!-- Forward Box -->
-
-            <div id="forward-box" style="display:none; margin-top:40px; border-top:1px solid #ddd; padding-top:30px;">
-
-                <h3>Forward Email</h3>
-
-                <select id="forward-select" style="
-                    width:100%;
-                    padding:14px;
-                    font-size:16px;
-                    border:1px solid #ccc;
-                    border-radius:6px;
-                    margin-bottom:20px;
-                ">
-
-                    <option value="">Select Recipient</option>
-
-                    <option value="good">
-                        CIBC@cibc.ca
-                    </option>
-
-                    <option value="good">
-                        ITsupport@it.ca
-                    </option>
-
-                    <option value="bad">
-                        coworkers@gmail.com
-                    </option>
-
-                </select>
-
-                <button class="send-button" onclick="forwardEmail()">
-                    Forward Email
-                </button>
-
-            </div>
-
-            <!-- Urgent Follow-up -->
-
-            <div id="urgent-email">
-
-                <h3>URGENT FOLLOW-UP NOTICE</h3>
-
-                <p>
-                    Your account remains at risk.
-                </p>
-
-                <p>
-                    Multiple additional failed login attempts have been detected since your last interaction.
-                </p>
-
-                <p>
-                    Immediate password reset is required to prevent temporary account suspension.
-                </p>
-
-                <a href="phishing_explination.html" class="reset-button">
-                    Secure Account Now
-                </a>
-
-            </div>
-
+        <div class="warning-box">
+            There have been several failed password attempts detected on your online banking account.
         </div>
 
-        <div class="footer">
+        <p>
+            To secure your account and prevent temporary suspension, please reset your password immediately.
+        </p>
 
-            Educational cybersecurity simulation only.<br>
-            Not affiliated with or endorsed by CIBC.
+        <a href="phishing_explination.html" class="reset-button">
+            Reset Your Password
+        </a>
 
+        <p style="margin-top:35px;">
+            Failure to reset your password within 24 hours may result in restricted access.
+        </p>
+
+        <p>
+            Thank you,<br>
+            CIBC Fraud Prevention Team
+        </p>
+
+        <div id="reply-box">
+            <h3>Reply</h3>
+            <textarea></textarea>
+            <button class="send-button" onclick="sendReply()">Send</button>
+        </div>
+
+        <div id="forward-box" style="display:none;">
+            <h3>Forward Email</h3>
+
+            <select id="forward-select">
+                <option value="">Select Recipient</option>
+                <option value="good">CIBC@cibc.ca</option>
+                <option value="good">ITsupport@it.ca</option>
+                <option value="bad">coworkers@gmail.com</option>
+            </select>
+
+            <button class="send-button" onclick="forwardEmail()">Forward Email</button>
+        </div>
+
+        <div id="urgent-email">
+            <h3>URGENT FOLLOW-UP NOTICE</h3>
+            <p>Your account remains at risk.</p>
+            <p>Immediate action required.</p>
         </div>
 
     </div>
 
-    <script>
+    <div class="footer">
+        Educational cybersecurity simulation only.
+    </div>
 
-        function showReply() {
+</div>
 
-            document.getElementById("reply-box").style.display = "block";
-
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: "smooth"
-            });
-
-        }
-
-        function sendReply() {
-
-            document.getElementById("urgent-email").style.display = "block";
-
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: "smooth"
-            });
-
-        }
-
-        function showForward() {
-
-            document.getElementById("forward-box").style.display = "block";
-
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: "smooth"
-            });
-
-        }
-
-        function forwardEmail() {
-
-            const value =
-                document.getElementById("forward-select").value;
-
-            if(value === "good") {
-
-                window.location.href =
-                    "phishing_explination_good_job.html";
-
-            }
-
-            else if(value === "bad") {
-
-                window.location.href =
-                    "phishing_explination.html";
-
-            }
-
-            else {
-
-                alert("Please select a recipient.");
-
-            }
-
-        }
-
-    </script>
 <script>
+
 function closeEduOverlay() {
     document.getElementById("edu-overlay").style.display = "none";
 }
+
+function showReply() {
+    document.getElementById("reply-box").style.display = "block";
+}
+
+function sendReply() {
+    document.getElementById("urgent-email").style.display = "block";
+}
+
+function showForward() {
+    document.getElementById("forward-box").style.display = "block";
+}
+
+function forwardEmail() {
+
+    const value = document.getElementById("forward-select").value;
+
+    if(value === "good") {
+        window.location.href = "phishing_explination_good_job.html";
+    } 
+    else if(value === "bad") {
+        window.location.href = "phishing_explination.html";
+    } 
+    else {
+        alert("Please select a recipient.");
+    }
+
+}
+
 </script>
+
 </body>
 </html>
