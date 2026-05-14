@@ -210,11 +210,80 @@
             color: #777;
             font-size: 13px;
         }
+#edu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+}
 
+.edu-box {
+    background: #ffffff;
+    width: 90%;
+    max-width: 600px;
+    padding: 35px;
+    border-radius: 10px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+.edu-box h1 {
+    margin-top: 0;
+    color: #d93025;
+}
+
+.edu-box p {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.edu-box button {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.edu-box button:hover {
+    background: #1558b0;
+}
     </style>
 </head>
 <body>
+<div id="edu-overlay">
 
+    <div class="edu-box">
+
+        <h1>Educational Simulation Notice</h1>
+
+        <p>
+            The following simulations are designed strictly for educational purposes only.
+        </p>
+
+        <p>
+            They demonstrate how phishing, viruses, worms, ransomware, and spyware may appear in real-world scenarios for cybersecurity learning.
+        </p>
+
+        <p>
+            This project was generated with assistance from ChatGPT and is intended for classroom and training use only.
+        </p>
+
+        <button onclick="closeEduOverlay()">
+            I Understand
+        </button>
+
+    </div>
+
+</div>
     <!-- Gmail Header -->
 
     <div class="topbar">
@@ -459,6 +528,10 @@
         }
 
     </script>
-
+<script>
+function closeEduOverlay() {
+    document.getElementById("edu-overlay").style.display = "none";
+}
+</script>
 </body>
 </html>
