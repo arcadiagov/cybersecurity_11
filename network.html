@@ -24,7 +24,6 @@
             pointer-events: none;
         }
 
-        /* Initial Infection Beam */
         #exploit-beam {
             position: fixed;
             top: -100px;
@@ -93,6 +92,8 @@
             z-index: 999;
         }
 
+        .hud-buttons { display: flex; gap: 10px; }
+
         .hud-box { text-align: center; }
         .hud-title { color: #999; font-size: 12px; text-transform: uppercase; }
         .hud-value { color: white; font-size: 24px; margin-top: 5px; font-weight: bold; }
@@ -120,6 +121,7 @@
         .warning { border-color: #ff9900; animation: pulse 0.4s infinite; }
         .infected { border-color: #ff0000; background: #220000; animation: infectedPulse 0.4s infinite; }
         .recovering { border-color: #0088ff; animation: pulse 0.4s infinite; }
+        .flash-green { background: #00ff00 !important; box-shadow: 0 0 40px #00ff00 !important; border-color: #ffffff !important; }
 
         .line {
             position: absolute;
@@ -148,6 +150,17 @@
         }
 
         #isolateBtn.unblock { background: #007a33; }
+
+        #patchBtn {
+            background: #995c00;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            min-width: 150px;
+        }
 
         #alerts {
             position: fixed;
@@ -188,7 +201,10 @@
 </div>
 
 <div class="hud">
-    <button id="isolateBtn" onclick="toggleIsolation()">ISOLATE NETWORK</button>
+    <div class="hud-buttons">
+        <button id="isolateBtn" onclick="toggleIsolation()">ISOLATE NETWORK</button>
+        <button id="patchBtn" onclick="deployPatch()">DEPLOY PATCH</button>
+    </div>
     <div class="hud-box">
         <div class="hud-title">Infected Nodes</div>
         <div class="hud-value" id="infectedCount">0</div>
@@ -243,10 +259,16 @@
         <div class="icon">💳</div><div class="label">POS-Terminal</div>
     </div>
 
+    <div class="node safe" id="n13" style="top:250px; left:600px;" onclick="initBackup()">
+        <div class="icon">💾</div><div class="label">Offline-Backup</div>
+    </div>
+
     <div class="line" id="l1"></div><div class="line" id="l2"></div><div class="line" id="l3"></div>
     <div class="line" id="l4"></div><div class="line" id="l5"></div><div class="line" id="l6"></div>
     <div class="line" id="l7"></div><div class="line" id="l8"></div><div class="line" id="l9"></div>
     <div class="line" id="l10"></div><div class="line" id="l11"></div>
+    
+    <div class="line" id="l12" style="display:none;"></div>
 </div>
 
 <div id="alerts"></div>
@@ -255,8 +277,15 @@
 let infectedCount = 0;
 let networkIsolated = false;
 let dataLoss = 0;
+let patchUsed = false;
+let systemFailed = false;
 
-const connections = [
+// Backup Drive Variables
+let backupMode = false;
+let isBackingUp = false;
+let backupTimer = null;
+
+let connections = [
     ['n1', 'n2', 'l1'], ['n2', 'n3', 'l2'], ['n2', 'n5', 'l3'],
     ['n5', 'n9', 'l4'], ['n1', 'n7', 'l5'], ['n3', 'n8', 'l6'],
     ['n3', 'n4', 'l7'], ['n4', 'n10', 'l8'], ['n4', 'n6', 'l9'],
@@ -270,14 +299,12 @@ function startSimulation() {
 
     setTimeout(() => {
         infect('n1', "⚠️ Breach detected on Office-PC-01");
-        // Super fast logic cycle
         setInterval(virusLogic, 800);
         setInterval(updateDataLoss, 1000);
     }, 600);
 }
 
 function createLines() {
-    // Simple logic to draw lines between nodes
     connections.forEach(([from, to, lineId]) => {
         const f = document.getElementById(from);
         const t = document.getElementById(to);
@@ -293,6 +320,7 @@ function connect(lineId, x1, y1, x2, y2) {
 }
 
 function toggleIsolation() {
+    if(systemFailed) return;
     const btn = document.getElementById("isolateBtn");
     networkIsolated = !networkIsolated;
     if (networkIsolated) {
@@ -307,8 +335,90 @@ function toggleIsolation() {
     }
 }
 
+function deployPatch() {
+    if (patchUsed || systemFailed) return;
+    patchUsed = true;
+    const btn = document.getElementById("patchBtn");
+    btn.style.opacity = '0.5';
+    btn.innerText = "PATCH DEPLOYED";
+    btn.style.cursor = "not-allowed";
+    
+    addAlert("⚙️ KILL SWITCH ACTIVATED: Global patch overriding malware...");
+
+    document.querySelectorAll('.node').forEach(node => {
+        if (node.classList.contains('infected') || node.classList.contains('warning')) {
+            node.classList.remove('infected', 'warning');
+            node.classList.add('recovering');
+            
+            if (node.dataset.origIcon) {
+                node.querySelector('.icon').innerText = node.dataset.origIcon;
+            }
+
+            setTimeout(() => {
+                node.classList.remove('recovering');
+                node.classList.add('safe');
+            }, 1500);
+        }
+    });
+
+    setTimeout(() => {
+        infectedCount = 0;
+        updateStats();
+        addAlert("✅ Patch successful. All local threats eradicated.");
+    }, 1500);
+}
+
+function initBackup() {
+    if (systemFailed || isBackingUp) return;
+    const n13 = document.getElementById('n13');
+    if (n13.classList.contains('infected')) return;
+    
+    backupMode = true;
+    n13.style.borderColor = '#0088ff';
+    n13.style.boxShadow = '0 0 20px #0088ff';
+    addAlert("💾 Offline Backup initialized. Select a drive to extract its data.");
+}
+
+function executeBackup(targetId) {
+    backupMode = false;
+    isBackingUp = true;
+    const n13 = document.getElementById('n13');
+    const target = document.getElementById(targetId);
+
+    // Show connection line
+    document.getElementById('l12').style.display = 'block';
+    connect('l12', parseInt(n13.style.left)+50, parseInt(n13.style.top)+50, parseInt(target.style.left)+50, parseInt(target.style.top)+50);
+
+    // Add connection to the active map so the virus can use it!
+    connections.push(['n13', targetId, 'l12']);
+    addAlert(`💾 Connecting to ${target.querySelector('.label').innerText}... Extracting individual drive data...`);
+
+    backupTimer = setTimeout(() => {
+        if (!n13.classList.contains('infected')) {
+            // Backup succeeded for this drive
+            n13.classList.add('flash-green');
+            addAlert(`✅ Data from ${target.querySelector('.label').innerText} secured.`);
+            
+            // Reclaims a smaller, specific portion of data (8% for one drive)
+            dataLoss = Math.max(0, dataLoss - 8);
+            document.getElementById("dataLoss").innerText = Math.floor(dataLoss) + "%";
+            
+            setTimeout(() => {
+                n13.classList.remove('flash-green');
+                n13.style.borderColor = '#00cc66';
+                n13.style.boxShadow = 'none';
+                
+                // Disconnect to allow securing another drive
+                document.getElementById('l12').style.display = 'none';
+                connections = connections.filter(c => c[2] !== 'l12');
+                isBackingUp = false;
+            }, 1000);
+        }
+    }, 4000);
+}
+
 function virusLogic() {
-    if (networkIsolated) return;
+    if (networkIsolated || systemFailed) return;
     connections.forEach(([fromId, toId, lineId]) => {
         const fromNode = document.getElementById(fromId);
         const toNode = document.getElementById(toId);
@@ -323,37 +433,80 @@ function virusLogic() {
 }
 
 function updateDataLoss() {
-    if (!networkIsolated && infectedCount > 0) {
-        dataLoss += infectedCount * 1.5; // Data loss grows based on infection size
-        if (dataLoss > 100) dataLoss = 100;
+    if (!networkIsolated && infectedCount > 0 && !systemFailed) {
+        dataLoss += infectedCount * 1.5; 
+        
+        if (dataLoss >= 100) {
+            dataLoss = 100;
+            triggerSystemFailure();
+        }
         document.getElementById("dataLoss").innerText = Math.floor(dataLoss) + "%";
     }
 }
 
+function triggerSystemFailure() {
+    systemFailed = true;
+    document.body.innerHTML = `
+        <div style="background:#440000; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:'Courier New', monospace; text-align:center; padding: 20px;">
+            <h1 style="font-size:60px; color: #ff4444; margin:0; text-shadow: 0 0 20px #ff0000;">SYSTEM COMPROMISED</h1>
+            <p style="font-size:24px; margin-top:20px;">CRITICAL DATA LOSS: 100%</p>
+            <p style="font-size:16px; color:#aaa; max-width: 600px;">All connected nodes have been encrypted. Offline backups destroyed. The network must be taken entirely offline.</p>
+            <button onclick="location.reload()" style="margin-top: 40px; padding:15px 30px; background:white; color:black; border:none; cursor:pointer; font-weight:bold; font-size: 18px;">REBOOT SIMULATION</button>
+        </div>
+    `;
+}
+
 function infect(nodeId, text) {
+    if (systemFailed) return;
     const node = document.getElementById(nodeId);
     if (!node.classList.contains('safe')) return;
+    
+    if (!node.dataset.origIcon) node.dataset.origIcon = node.querySelector('.icon').innerText;
+
     node.classList.remove('safe');
     node.classList.add('warning');
     addAlert(text);
+    
     setTimeout(() => {
         if (node.classList.contains('warning')) {
             node.classList.remove('warning');
             node.classList.add('infected');
+            
+            node.querySelector('.icon').innerText = '🔒';
+            
             infectedCount++;
             updateStats();
+
+            if (nodeId === 'n13') {
+                addAlert("❌ CRITICAL: BACKUP DRIVE INFECTED. ALL SAVED DATA LOST!");
+                dataLoss = 100;
+                updateDataLoss();
+            }
         }
     }, 600);
 }
 
 function recoverNode(nodeId) {
+    if (systemFailed) return;
+
+    if (backupMode && nodeId !== 'n13') {
+        executeBackup(nodeId);
+        return;
+    }
+
     const node = document.getElementById(nodeId);
     if (node.classList.contains('infected')) {
         node.classList.remove('infected');
         node.classList.add('recovering');
+        
         setTimeout(() => {
             node.classList.remove('recovering');
             node.classList.add('safe');
+            
+            if (node.dataset.origIcon) {
+                node.querySelector('.icon').innerText = node.dataset.origIcon;
+            }
+
             infectedCount = Math.max(0, infectedCount - 1);
             updateStats();
             addAlert(`✅ Sanitized: ${node.querySelector('.label').innerText}`);
@@ -362,18 +515,20 @@ function recoverNode(nodeId) {
 }
 
 function updateStats() {
+    if(systemFailed) return;
     document.getElementById("infectedCount").innerText = infectedCount;
     const threat = document.getElementById("threat");
     if (infectedCount >= 8) { threat.innerText = "CRITICAL"; document.body.classList.add("glitch"); }
-    else if (infectedCount >= 4) { threat.innerText = "HIGH"; }
+    else if (infectedCount >= 4) { threat.innerText = "HIGH"; document.body.classList.remove("glitch"); }
     else { threat.innerText = "LOW"; document.body.classList.remove("glitch"); }
 }
 
 function activateLine(id) {
-    if (!networkIsolated) document.getElementById(id).classList.add("active");
+    if (!networkIsolated && !systemFailed) document.getElementById(id).classList.add("active");
 }
 
 function addAlert(text) {
+    if(systemFailed) return;
     const alerts = document.getElementById("alerts");
     const div = document.createElement("div");
     div.className = "alert";
