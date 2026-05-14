@@ -7,7 +7,7 @@
     <style>
         body {
             margin: 0;
-            background: #050505;
+            background: #020202;
             overflow: hidden;
             font-family: 'Segoe UI', Arial, sans-serif;
             color: white;
@@ -20,8 +20,32 @@
             background-image:
                 linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background-size: 40px 40px;
             pointer-events: none;
+        }
+
+        /* NEW: Initial Infection Animation */
+        #exploit-beam {
+            position: fixed;
+            top: -100px;
+            left: 180px;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, #ff0000, #ffffff);
+            box-shadow: 0 0 20px #ff0000;
+            z-index: 1000;
+            display: none;
+        }
+
+        .beam-animate {
+            display: block !important;
+            animation: beamDrop 0.8s ease-in forwards;
+        }
+
+        @keyframes beamDrop {
+            0% { top: -100px; opacity: 1; }
+            80% { opacity: 1; }
+            100% { top: 180px; opacity: 0; transform: scaleY(0.1); }
         }
 
         #overlay {
@@ -71,54 +95,54 @@
         }
 
         .hud-box { text-align: center; }
-        .hud-title { color: #999; font-size: 12px; text-transform: uppercase; }
-        .hud-value { color: white; font-size: 24px; margin-top: 5px; font-weight: bold; }
+        .hud-title { color: #999; font-size: 11px; text-transform: uppercase; }
+        .hud-value { color: white; font-size: 22px; margin-top: 5px; font-weight: bold; }
 
         .node {
             position: absolute;
-            width: 115px; /* Slightly wider for longer names */
-            height: 115px;
+            width: 95px;
+            height: 95px;
             border-radius: 50%;
             background: #0f0f0f;
-            border: 4px solid #00cc66;
+            border: 3px solid #00cc66;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: 0.4s;
+            transition: 0.3s;
             z-index: 5;
             cursor: pointer;
             box-sizing: border-box;
             padding: 5px;
         }
 
-        .node .icon { font-size: 32px; }
+        .node .icon { font-size: 24px; }
         .node .label { 
-            margin-top: 5px; 
-            font-size: 11px; 
+            margin-top: 4px; 
+            font-size: 10px; 
             text-align: center; 
             font-weight: bold;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
-        .safe { border-color: #00cc66; box-shadow: 0 0 15px rgba(0,255,100,0.2); }
-        .warning { border-color: #ff9900; animation: pulse 0.8s infinite; }
-        .infected { border-color: #ff0000; background: #220000; animation: infectedPulse 0.6s infinite; }
-        .recovering { border-color: #0088ff; animation: pulse 0.4s infinite; }
+        .safe { border-color: #00cc66; box-shadow: 0 0 10px rgba(0,255,100,0.1); }
+        .warning { border-color: #ff9900; animation: pulse 0.5s infinite; }
+        .infected { border-color: #ff0000; background: #220000; animation: infectedPulse 0.4s infinite; }
+        .recovering { border-color: #0088ff; animation: pulse 0.3s infinite; }
 
         .line {
             position: absolute;
-            height: 3px;
-            background: rgba(255,255,255,0.1);
+            height: 2px;
+            background: rgba(255,255,255,0.06);
             transform-origin: left center;
             z-index: 1;
-            transition: 0.3s;
+            transition: 0.2s;
         }
 
         .line.active {
             background: #ff0000;
-            box-shadow: 0 0 10px #ff0000;
-            animation: lineFlash 0.3s infinite;
+            box-shadow: 0 0 8px #ff0000;
+            animation: lineFlash 0.2s infinite;
         }
 
         #isolateBtn {
@@ -138,16 +162,16 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 320px;
+            width: 300px;
             z-index: 99999;
         }
 
         .alert {
-            background: rgba(20,20,20,0.95);
+            background: rgba(15,0,0,0.95);
             border-left: 4px solid #ff4444;
-            padding: 12px;
-            margin-top: 8px;
-            font-size: 13px;
+            padding: 10px;
+            margin-top: 6px;
+            font-size: 12px;
             animation: slideIn 0.3s ease;
         }
 
@@ -156,7 +180,7 @@
             top: 100px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(180,0,0,0.9);
+            background: rgba(200,0,0,0.9);
             padding: 10px 25px;
             border-radius: 5px;
             font-weight: bold;
@@ -164,37 +188,39 @@
             z-index: 999;
         }
 
-        .glitch { animation: screenGlitch 0.15s infinite; }
+        .glitch { animation: screenGlitch 0.1s infinite; }
 
-        @keyframes infectedPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        @keyframes lineFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        @keyframes infectedPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes lineFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.1; } }
         @keyframes slideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes screenGlitch { 0% { transform: translate(0,0); } 10% { transform: translate(-2px,1px); } 90% { transform: translate(2px,-1px); } }
+        @keyframes screenGlitch { 0% { transform: translate(0,0); } 50% { transform: translate(-3px,2px); } 100% { transform: translate(3px,-2px); } }
     </style>
 </head>
 <body>
 
+<div id="exploit-beam"></div>
+
 <div id="overlay">
     <div class="overlay-box">
-        <h1>Network Breach Simulation</h1>
-        <p>Infection spreads between connected nodes. Click <strong>Isolate</strong> to cut traffic, then click infected nodes to <strong>Sanitize</strong> them. If you unblock while threats remain, the spread will continue.</p>
-        <button onclick="startSimulation()">INITIATE NETWORK</button>
+        <h1>VULNERABILITY DETECTED</h1>
+        <p>A high-speed worm is targeting the local network. Your firewall is the only defense. Isolate the network to halt the spread and manually sanitize infected hardware.</p>
+        <button onclick="startSimulation()">DEPLOY DEFENSES</button>
     </div>
 </div>
 
 <div class="hud">
     <button id="isolateBtn" onclick="toggleIsolation()">ISOLATE NETWORK</button>
     <div class="hud-box">
-        <div class="hud-title">Infected</div>
+        <div class="hud-title">Infected Nodes</div>
         <div class="hud-value" id="infectedCount">0</div>
     </div>
     <div class="hud-box">
-        <div class="hud-title">Health</div>
+        <div class="hud-title">System Integrity</div>
         <div class="hud-value" id="healthStatus">100%</div>
     </div>
     <div class="hud-box">
-        <div class="hud-title">Threat</div>
+        <div class="hud-title">Alert Level</div>
         <div class="hud-value" id="threat">LOW</div>
     </div>
 </div>
@@ -210,7 +236,7 @@
     </div>
     <div class="node safe" id="n3" style="top:480px; left:250px;" onclick="recoverNode('n3')">
         <div class="icon">📱</div>
-        <div class="label">Employee-Phone</div>
+        <div class="label">Emp-Phone</div>
     </div>
     <div class="node safe" id="n4" style="top:450px; left:700px;" onclick="recoverNode('n4')">
         <div class="icon">☁️</div>
@@ -225,11 +251,35 @@
         <div class="label">Network-Printer</div>
     </div>
 
-    <div class="line" id="l1"></div>
-    <div class="line" id="l2"></div>
-    <div class="line" id="l3"></div>
-    <div class="line" id="l4"></div>
-    <div class="line" id="l5"></div>
+    <div class="node safe" id="n7" style="top:350px; left:40px;" onclick="recoverNode('n7')">
+        <div class="icon">📡</div>
+        <div class="label">Guest-WiFi</div>
+    </div>
+    <div class="node safe" id="n8" style="top:600px; left:500px;" onclick="recoverNode('n8')">
+        <div class="icon">🗄️</div>
+        <div class="label">Data-Center</div>
+    </div>
+    <div class="node safe" id="n9" style="top:100px; left:750px;" onclick="recoverNode('n9')">
+        <div class="icon">👔</div>
+        <div class="label">CEO-Tablet</div>
+    </div>
+    <div class="node safe" id="n10" style="top:650px; left:800px;" onclick="recoverNode('n10')">
+        <div class="icon">🎥</div>
+        <div class="label">Security-Cam</div>
+    </div>
+    <div class="node safe" id="n11" style="top:320px; left:1150px;" onclick="recoverNode('n11')">
+        <div class="icon">📠</div>
+        <div class="label">VOIP-Phone</div>
+    </div>
+    <div class="node safe" id="n12" style="top:550px; left:1250px;" onclick="recoverNode('n12')">
+        <div class="icon">💳</div>
+        <div class="label">POS-Terminal</div>
+    </div>
+
+    <div class="line" id="l1"></div><div class="line" id="l2"></div><div class="line" id="l3"></div>
+    <div class="line" id="l4"></div><div class="line" id="l5"></div><div class="line" id="l6"></div>
+    <div class="line" id="l7"></div><div class="line" id="l8"></div><div class="line" id="l9"></div>
+    <div class="line" id="l10"></div><div class="line" id="l11"></div>
 </div>
 
 <div id="system-banner"></div>
@@ -239,19 +289,27 @@
 let infectedCount = 0;
 let networkIsolated = false;
 
+// Updated Connections Map
 const connections = [
-    ['n1', 'n2', 'l1'],
-    ['n1', 'n3', 'l2'],
-    ['n2', 'n4', 'l3'],
-    ['n2', 'n5', 'l4'],
-    ['n4', 'n6', 'l5']
+    ['n1', 'n2', 'l1'], ['n1', 'n3', 'l2'], ['n2', 'n4', 'l3'],
+    ['n2', 'n5', 'l4'], ['n4', 'n6', 'l5'], ['n1', 'n7', 'l6'],
+    ['n3', 'n8', 'l7'], ['n5', 'n9', 'l8'], ['n4', 'n10', 'l9'],
+    ['n6', 'n11', 'l10'], ['n11', 'n12', 'l11']
 ];
 
 function startSimulation() {
     document.getElementById("overlay").style.display = "none";
     createLines();
-    infect('n1', "⚠️ Zero-day exploit detected on Office-PC-01");
-    setInterval(virusLogic, 2500);
+    
+    // Original Animation Trigger
+    const beam = document.getElementById("exploit-beam");
+    beam.classList.add("beam-animate");
+
+    setTimeout(() => {
+        infect('n1', "🚨 CRITICAL: Inbound exploit payload executed on Office-PC-01");
+        // Faster logic loop (1.2s instead of 2.5s)
+        setInterval(virusLogic, 1200);
+    }, 800);
 }
 
 function createLines() {
@@ -260,6 +318,12 @@ function createLines() {
     connect("l3", 575, 275, 755, 505);
     connect("l4", 575, 275, 1010, 215);
     connect("l5", 755, 505, 1060, 575);
+    connect("l6", 240, 235, 80, 400); // n1 to n7
+    connect("l7", 300, 535, 540, 650); // n3 to n8
+    connect("l8", 1010, 215, 800, 150); // n5 to n9
+    connect("l9", 755, 505, 850, 700); // n4 to n10
+    connect("l10", 1060, 575, 1200, 370); // n6 to n11
+    connect("l11", 1200, 370, 1300, 600); // n11 to n12
 }
 
 function connect(lineId, x1, y1, x2, y2) {
@@ -275,36 +339,29 @@ function connect(lineId, x1, y1, x2, y2) {
 function toggleIsolation() {
     const btn = document.getElementById("isolateBtn");
     networkIsolated = !networkIsolated;
-
     if (networkIsolated) {
         btn.innerText = "UNBLOCK NETWORK";
         btn.classList.add("unblock");
         document.querySelectorAll('.line').forEach(l => l.classList.remove('active'));
-        addAlert("🛡️ Firewall active. Connections severed.");
+        addAlert("🛡️ PROTOCOL ACTIVE: Air-gap isolation enabled.");
     } else {
         btn.innerText = "ISOLATE NETWORK";
         btn.classList.remove("unblock");
-        addAlert("🌐 Network restored. Scanning for threats...");
+        addAlert("🌐 Re-establishing connections...");
     }
 }
 
 function virusLogic() {
     if (networkIsolated) return;
-
     connections.forEach(([fromId, toId, lineId]) => {
         const fromNode = document.getElementById(fromId);
         const toNode = document.getElementById(toId);
-
         if (fromNode.classList.contains('infected') && toNode.classList.contains('safe')) {
             activateLine(lineId);
-            setTimeout(() => {
-                if(!networkIsolated) infect(toId, `⚠️ Malware spread to ${toNode.querySelector('.label').innerText}`);
-            }, 1000);
+            setTimeout(() => { if(!networkIsolated) infect(toId, `⚠️ Worm propagating: ${toNode.querySelector('.label').innerText}`); }, 600);
         } else if (toNode.classList.contains('infected') && fromNode.classList.contains('safe')) {
             activateLine(lineId);
-            setTimeout(() => {
-                if(!networkIsolated) infect(fromId, `⚠️ Lateral movement to ${fromNode.querySelector('.label').innerText}`);
-            }, 1000);
+            setTimeout(() => { if(!networkIsolated) infect(fromId, `⚠️ Lateral spread: ${fromNode.querySelector('.label').innerText}`); }, 600);
         }
     });
 }
@@ -312,11 +369,10 @@ function virusLogic() {
 function infect(nodeId, text) {
     const node = document.getElementById(nodeId);
     if (!node.classList.contains('safe')) return;
-
     node.classList.remove('safe');
     node.classList.add('warning');
     addAlert(text);
-
+    // Faster infection finalization (0.8s instead of 1.5s)
     setTimeout(() => {
         if (node.classList.contains('warning')) {
             node.classList.remove('warning');
@@ -324,7 +380,7 @@ function infect(nodeId, text) {
             infectedCount++;
             updateStats();
         }
-    }, 1500);
+    }, 800);
 }
 
 function recoverNode(nodeId) {
@@ -332,39 +388,28 @@ function recoverNode(nodeId) {
     if (node.classList.contains('infected')) {
         node.classList.remove('infected');
         node.classList.add('recovering');
-        
         setTimeout(() => {
             node.classList.remove('recovering');
             node.classList.add('safe');
             infectedCount = Math.max(0, infectedCount - 1);
             updateStats();
-            addAlert(`✅ ${node.querySelector('.label').innerText} sanitized.`);
-        }, 2000);
+            addAlert(`✅ Recovered: ${node.querySelector('.label').innerText}`);
+        }, 1200);
     }
 }
 
 function updateStats() {
     document.getElementById("infectedCount").innerText = infectedCount;
-    const health = Math.round(((6 - infectedCount) / 6) * 100);
+    const health = Math.round(((12 - infectedCount) / 12) * 100);
     document.getElementById("healthStatus").innerText = health + "%";
-    
     const threat = document.getElementById("threat");
-    if (infectedCount >= 4) {
-        threat.innerText = "CRITICAL";
-        document.body.classList.add("glitch");
-    } else if (infectedCount >= 2) {
-        threat.innerText = "HIGH";
-        document.body.classList.remove("glitch");
-    } else {
-        threat.innerText = "LOW";
-        document.body.classList.remove("glitch");
-    }
+    if (infectedCount >= 8) { threat.innerText = "CRITICAL"; document.body.classList.add("glitch"); }
+    else if (infectedCount >= 4) { threat.innerText = "HIGH"; document.body.classList.remove("glitch"); }
+    else { threat.innerText = "LOW"; document.body.classList.remove("glitch"); }
 }
 
 function activateLine(id) {
-    if (!networkIsolated) {
-        document.getElementById(id).classList.add("active");
-    }
+    if (!networkIsolated) document.getElementById(id).classList.add("active");
 }
 
 function addAlert(text) {
@@ -373,7 +418,7 @@ function addAlert(text) {
     div.className = "alert";
     div.innerHTML = text;
     alerts.prepend(div);
-    if(alerts.children.length > 6) alerts.lastChild.remove();
+    if(alerts.children.length > 8) alerts.lastChild.remove();
 }
 </script>
 </body>
