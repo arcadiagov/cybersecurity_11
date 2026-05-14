@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Infection Simulation</title>
+
+<style>
+
+body {
+    margin: 0;
+    background: #050505;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+}
+
+/* Background grid */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+}
+
+/* Overlay */
+
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.96);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+}
+
+.overlay-box {
+    width: 90%;
+    max-width: 800px;
+    background: #101010;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255,0,0,0.15);
+}
+
+.overlay-box h1 {
+    color: #ff4444;
+    margin-top: 0;
+    font-size: 42px;
+}
+
+.overlay-box p {
+    color: #ccc;
+    line-height: 1.8;
+    font-size: 17px;
+}
+
+.overlay-box button {
+    margin-top: 25px;
+    padding: 15px 30px;
+    background: #009944;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.overlay-box button:hover {
+    background: #00bb55;
+}
+
+/* Top HUD */
+
+.hud {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 90px;
+    background: rgba(0,0,0,0.92);
+    border-bottom: 1px solid #222;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 999;
+}
+
+.hud-box {
+    text-align: center;
+}
+
+.hud-title {
+    color: #999;
+    font-size: 14px;
+}
+
+.hud-value {
+    color: white;
+    font-size: 28px;
+    margin-top: 5px;
+}
+
+/* Network area */
+
+.network {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Nodes */
+
+.node {
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: #0f0f0f;
+    border: 4px solid #00cc66;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    transition: 1s;
+    box-shadow: 0 0 20px rgba(0,255,100,0.2);
+    z-index: 5;
+}
+
+.node .icon {
+    font-size: 34px;
+}
+
+.node .label {
+    margin-top: 8px;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* States */
+
+.safe {
+    border-color: #00cc66;
+    box-shadow: 0 0 20px rgba(0,255,100,0.2);
+}
+
+.warning {
+    border-color: orange;
+    box-shadow: 0 0 25px rgba(255,165,0,0.5);
+    animation: pulse 1s infinite;
+}
+
+.infected {
+    border-color: red;
+    background: #220000;
+    box-shadow: 0 0 35px rgba(255,0,0,0.8);
+    animation: infectedPulse 0.7s infinite;
+}
+
+.offline {
+    border-color: #444;
+    background: #111;
+    opacity: 0.4;
+}
+
+/* Connection lines */
+
+.line {
+    position: absolute;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    transform-origin: left center;
+    z-index: 1;
+}
+
+.line.active {
+    background: red;
+    box-shadow: 0 0 15px red;
+    animation: lineFlash 0.4s infinite;
+}
+
+/* Alerts */
+
+#alerts {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 380px;
+    z-index: 99999;
+}
+
+.alert {
+    background: rgba(30,0,0,0.95);
+    border-left: 5px solid red;
+    padding: 15px;
+    margin-top: 12px;
+    color: #ffcccc;
+    animation: slideIn 0.4s ease;
+    font-size: 14px;
+}
+
+/* Animations */
+
+@keyframes infectedPulse {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+}
+
+@keyframes pulse {
+
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+
+    100% {
+        opacity: 1;
+    }
+
+}
+
+@keyframes lineFlash {
+
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+
+}
+
+@keyframes slideIn {
+
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<!-- Overlay -->
+
+<div id="overlay">
+
+    <div class="overlay-box">
+
+        <h1>Educational Malware Spread Simulation</h1>
+
+        <p>
+            This page demonstrates how worms and viruses may spread through connected devices and networks.
+        </p>
+
+        <p>
+            This simulation does not perform any real malware activity and is intended strictly for cybersecurity education and awareness.
+        </p>
+
+        <button onclick="startSimulation()">
+            Start Simulation
+        </button>
+
+    </div>
+
+</div>
+
+<!-- HUD -->
+
+<div class="hud">
+
+    <div class="hud-box">
+        <div class="hud-title">
+            Devices Infected
+        </div>
+        <div class="hud-value" id="infectedCount">
+            0
+        </div>
+    </div>
+
+    <div class="hud-box">
+        <div class="hud-title">
+            Network Traffic
+        </div>
+        <div class="hud-value" id="traffic">
+            Normal
+        </div>
+    </div>
+
+    <div class="hud-box">
+        <div class="hud-title">
+            Threat Level
+        </div>
+        <div class="hud-value" id="threat">
+            LOW
+        </div>
+    </div>
+
+    <div class="hud-box">
+        <div class="hud-title">
+            Malware Type
+        </div>
+        <div class="hud-value">
+            Worm.VX
+        </div>
+    </div>
+
+</div>
+
+<!-- Network -->
+
+<div class="network">
+
+    <!-- Nodes -->
+
+    <div class="node safe" id="n1" style="top:180px; left:180px;">
+        <div class="icon">💻</div>
+        <div class="label">Office-PC-01</div>
+    </div>
+
+    <div class="node safe" id="n2" style="top:220px; left:520px;">
+        <div class="icon">🖥️</div>
+        <div class="label">Finance-Server</div>
+    </div>
+
+    <div class="node safe" id="n3" style="top:480px; left:250px;">
+        <div class="icon">📱</div>
+        <div class="label">Employee-Phone</div>
+    </div>
+
+    <div class="node safe" id="n4" style="top:450px; left:700px;">
+        <div class="icon">☁️</div>
+        <div class="label">Cloud-Storage</div>
+    </div>
+
+    <div class="node safe" id="n5" style="top:160px; left:950px;">
+        <div class="icon">🖥️</div>
+        <div class="label">HR-Laptop</div>
+    </div>
+
+    <div class="node safe" id="n6" style="top:520px; left:1000px;">
+        <div class="icon">🖨️</div>
+        <div class="label">Network-Printer</div>
+    </div>
+
+    <!-- Lines -->
+
+    <div class="line" id="l1"></div>
+    <div class="line" id="l2"></div>
+    <div class="line" id="l3"></div>
+    <div class="line" id="l4"></div>
+    <div class="line" id="l5"></div>
+
+</div>
+
+<!-- Alerts -->
+
+<div id="alerts"></div>
+
+<script>
+
+function startSimulation() {
+
+    document.getElementById("overlay").style.display = "none";
+
+    createLines();
+
+    startInfection();
+
+}
+
+/* Create line positions */
+
+function connect(lineId, x1, y1, x2, y2) {
+
+    const line = document.getElementById(lineId);
+
+    const length =
+        Math.hypot(x2 - x1, y2 - y1);
+
+    const angle =
+        Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+    line.style.width = length + "px";
+
+    line.style.left = x1 + "px";
+
+    line.style.top = y1 + "px";
+
+    line.style.transform =
+        `rotate(${angle}deg)`;
+
+}
+
+function createLines() {
+
+    connect("l1", 240, 235, 575, 275);
+    connect("l2", 240, 235, 300, 535);
+    connect("l3", 575, 275, 755, 505);
+    connect("l4", 575, 275, 1010, 215);
+    connect("l5", 755, 505, 1060, 575);
+
+}
+
+let infected = 0;
+
+function infect(nodeId, alertText) {
+
+    const node =
+        document.getElementById(nodeId);
+
+    node.classList.remove("safe");
+
+    node.classList.add("warning");
+
+    addAlert(alertText);
+
+    setTimeout(() => {
+
+        node.classList.remove("warning");
+
+        node.classList.add("infected");
+
+        infected++;
+
+        document.getElementById("infectedCount").innerText =
+            infected;
+
+        updateThreat();
+
+    }, 1500);
+
+}
+
+function updateThreat() {
+
+    if(infected >= 5) {
+
+        document.getElementById("threat").innerText =
+            "CRITICAL";
+
+        document.getElementById("traffic").innerText =
+            "SATURATED";
+
+    }
+
+    else if(infected >= 3) {
+
+        document.getElementById("threat").innerText =
+            "HIGH";
+
+        document.getElementById("traffic").innerText =
+            "ELEVATED";
+
+    }
+
+    else {
+
+        document.getElementById("threat").innerText =
+            "MEDIUM";
+
+        document.getElementById("traffic").innerText =
+            "UNSTABLE";
+
+    }
+
+}
+
+function addAlert(text) {
+
+    const alerts =
+        document.getElementById("alerts");
+
+    const div =
+        document.createElement("div");
+
+    div.className = "alert";
+
+    div.innerHTML = text;
+
+    alerts.prepend(div);
+
+}
+
+function activateLine(id) {
+
+    document.getElementById(id)
+        .classList.add("active");
+
+}
+
+/* Infection timeline */
+
+function startInfection() {
+
+    infect(
+        "n1",
+        "⚠️ Suspicious executable detected on Office-PC-01"
+    );
+
+    activateLine("l1");
+
+    setTimeout(() => {
+
+        infect(
+            "n2",
+            "⚠️ Unauthorized replication detected on Finance-Server"
+        );
+
+    }, 3000);
+
+    setTimeout(() => {
+
+        activateLine("l2");
+
+        infect(
+            "n3",
+            "⚠️ Malware propagation detected on Employee-Phone"
+        );
+
+    }, 5500);
+
+    setTimeout(() => {
+
+        activateLine("l3");
+
+        infect(
+            "n4",
+            "⚠️ Cloud synchronization compromise detected"
+        );
+
+    }, 8000);
+
+    setTimeout(() => {
+
+        activateLine("l4");
+
+        infect(
+            "n5",
+            "⚠️ HR-Laptop executing unknown processes"
+        );
+
+    }, 10500);
+
+    setTimeout(() => {
+
+        activateLine("l5");
+
+        infect(
+            "n6",
+            "⚠️ Network printer flooding traffic requests"
+        );
+
+    }, 13000);
+
+    setTimeout(() => {
+
+        addAlert(
+            "🚨 NETWORK-WIDE OUTBREAK DETECTED — ISOLATE DEVICES IMMEDIATELY"
+        );
+
+    }, 15000);
+
+}
+
+</script>
+
+</body>
+</html>
