@@ -101,10 +101,57 @@
             color: #777;
             font-size: 14px;
         }
+.glitch {
+    animation: glitch 0.15s infinite;
+}
 
+@keyframes glitch {
+    0% { transform: translate(0,0); }
+    20% { transform: translate(-1px,1px); }
+    40% { transform: translate(1px,-1px); }
+    60% { transform: translate(-1px,-1px); }
+    80% { transform: translate(1px,1px); }
+    100% { transform: translate(0,0); }
+}
+
+.alert {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #1a0000;
+    border: 1px solid red;
+    color: red;
+    padding: 10px 15px;
+    font-size: 14px;
+    display: none;
+    z-index: 10000;
+}
+
+.progress-bar {
+    height: 6px;
+    width: 100%;
+    background: #330000;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    background: red;
+    animation: load 10s linear forwards;
+}
+
+@keyframes load {
+    from { width: 0%; }
+    to { width: 100%; }
+}
     </style>
 </head>
 <body>
+    <div class="alert" id="alertBox">
+    ⚠ Network anomaly detected
+</div>
 
     <!-- Fake worm activity overlay -->
     <div id="overlay">
@@ -180,18 +227,73 @@ Compromising connected systems...
 
     </div>
 
-    <script>
+   
 
-        // Hide overlay after 10 seconds
-        setTimeout(() => {
+      <script>
 
-            document.getElementById("overlay").style.display = "none";
+const overlay = document.getElementById("overlay");
+const main = document.getElementById("main-content");
+const terminal = document.getElementById("terminal-text");
 
-            document.getElementById("main-content").style.display = "block";
+const lines = terminal.innerText.split("\n");
+terminal.innerText = "";
 
-        }, 10000);
+let i = 0;
 
-    </script>
+// TYPEWRITER EFFECT (makes logs feel real)
+function typeLine() {
+
+    if (i < lines.length) {
+        terminal.innerText += lines[i] + "\n";
+        i++;
+
+        // random speed variation = realism
+        setTimeout(typeLine, Math.random() * 300 + 100);
+    }
+}
+
+typeLine();
+
+// Fake alert popup bursts
+const alertBox = document.getElementById("alertBox");
+
+setTimeout(() => {
+    alertBox.style.display = "block";
+}, 2000);
+
+setTimeout(() => {
+    alertBox.style.display = "none";
+}, 5000);
+
+setTimeout(() => {
+    alertBox.style.display = "block";
+    alertBox.innerText = "⚠ Unauthorized replication detected";
+}, 7000);
+
+setTimeout(() => {
+    alertBox.style.display = "none";
+}, 9000);
+
+// Screen glitch effect
+setTimeout(() => {
+    overlay.classList.add("glitch");
+}, 4000);
+
+// REMOVE OVERLAY (your original timing kept but smoother)
+setTimeout(() => {
+
+    overlay.style.opacity = "0";
+    overlay.style.transition = "opacity 1.5s ease";
+
+    setTimeout(() => {
+        overlay.style.display = "none";
+        main.style.display = "block";
+    }, 1500);
+
+}, 10000);
+
+</script>
+
 
 </body>
 </html>
