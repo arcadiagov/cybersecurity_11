@@ -208,6 +208,71 @@ body::before {
     font-size: 14px;
 }
 
+/* Isolation Button */
+
+#isolateBtn {
+    background: #b30000;
+    color: white;
+    border: none;
+    padding: 14px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    transition: 0.2s;
+    box-shadow: 0 0 15px rgba(255,0,0,0.4);
+}
+
+#isolateBtn:hover {
+    background: #e00000;
+}
+
+#isolateBtn.active {
+    background: #007a33;
+    box-shadow: 0 0 20px rgba(0,255,100,0.5);
+}
+
+/* Firewall popups */
+
+.firewall-popup {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    width: 340px;
+    background: rgba(20,20,20,0.96);
+    border-left: 5px solid orange;
+    padding: 15px;
+    color: white;
+    font-size: 14px;
+    z-index: 999999;
+    animation: popupSlide 0.4s ease;
+    margin-top: 12px;
+}
+
+/* System banner */
+
+#system-banner {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(120,0,0,0.92);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    display: none;
+    z-index: 999999;
+    box-shadow: 0 0 25px rgba(255,0,0,0.5);
+}
+
+/* Glitch */
+
+.glitch {
+    animation: screenGlitch 0.18s infinite;
+}
+
 /* Animations */
 
 @keyframes infectedPulse {
@@ -271,46 +336,6 @@ body::before {
     }
 
 }
-/* ADD THIS TO YOUR CSS */
-
-#isolateBtn {
-    background: #b30000;
-    color: white;
-    border: none;
-    padding: 14px 22px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 15px;
-    transition: 0.2s;
-    box-shadow: 0 0 15px rgba(255,0,0,0.4);
-}
-
-#isolateBtn:hover {
-    background: #e00000;
-}
-
-#isolateBtn.active {
-    background: #007a33;
-    box-shadow: 0 0 20px rgba(0,255,100,0.5);
-}
-
-/* Firewall status popups */
-
-.firewall-popup {
-    position: fixed;
-    left: 20px;
-    bottom: 20px;
-    width: 340px;
-    background: rgba(20,20,20,0.96);
-    border-left: 5px solid orange;
-    padding: 15px;
-    color: white;
-    font-size: 14px;
-    z-index: 999999;
-    animation: popupSlide 0.4s ease;
-    margin-top: 12px;
-}
 
 @keyframes popupSlide {
 
@@ -323,32 +348,6 @@ body::before {
         transform: translateY(0);
         opacity: 1;
     }
-
-}
-
-/* System banner */
-
-#system-banner {
-    position: fixed;
-    top: 90px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(120,0,0,0.92);
-    color: white;
-    padding: 15px 30px;
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 16px;
-    display: none;
-    z-index: 999999;
-    box-shadow: 0 0 25px rgba(255,0,0,0.5);
-}
-
-/* Screen glitch */
-
-.glitch {
-
-    animation: screenGlitch 0.18s infinite;
 
 }
 
@@ -379,6 +378,7 @@ body::before {
     }
 
 }
+
 </style>
 </head>
 <body>
@@ -410,11 +410,11 @@ body::before {
 <!-- HUD -->
 
 <div class="hud">
-<!-- ADD THIS BUTTON INSIDE THE .hud DIV -->
 
-<button id="isolateBtn" onclick="isolateNetwork()">
-    ISOLATE DEVICES
-</button>
+    <button id="isolateBtn" onclick="isolateNetwork()">
+        ISOLATE DEVICES
+    </button>
+
     <div class="hud-box">
         <div class="hud-title">
             Devices Infected
@@ -457,8 +457,6 @@ body::before {
 
 <div class="network">
 
-    <!-- Nodes -->
-
     <div class="node safe" id="n1" style="top:180px; left:180px;">
         <div class="icon">💻</div>
         <div class="label">Office-PC-01</div>
@@ -489,8 +487,6 @@ body::before {
         <div class="label">Network-Printer</div>
     </div>
 
-    <!-- Lines -->
-
     <div class="line" id="l1"></div>
     <div class="line" id="l2"></div>
     <div class="line" id="l3"></div>
@@ -499,7 +495,7 @@ body::before {
 
 </div>
 
-<!-- Alerts -->
+<div id="system-banner"></div>
 
 <div id="alerts"></div>
 
@@ -514,8 +510,6 @@ function startSimulation() {
     startInfection();
 
 }
-
-/* Create line positions */
 
 function connect(lineId, x1, y1, x2, y2) {
 
@@ -549,8 +543,26 @@ function createLines() {
 }
 
 let infected = 0;
+let networkIsolated = false;
+let infectionAttempts = 0;
 
 function infect(nodeId, alertText) {
+
+    infectionAttempts++;
+
+    if(networkIsolated) {
+
+        addAlert(
+            "⛔ Infection attempt blocked by network isolation"
+        );
+
+        firewallPopup(
+            "Firewall intercepted malicious lateral movement attempt."
+        );
+
+        return;
+
+    }
 
     const node =
         document.getElementById(nodeId);
@@ -560,6 +572,10 @@ function infect(nodeId, alertText) {
     node.classList.add("warning");
 
     addAlert(alertText);
+
+    firewallPopup(
+        "⚠️ Suspicious outbound traffic detected from " + nodeId
+    );
 
     setTimeout(() => {
 
@@ -573,6 +589,36 @@ function infect(nodeId, alertText) {
             infected;
 
         updateThreat();
+
+        if(infected >= 2) {
+
+            firewallPopup(
+                "🚨 Firewall packet inspection overloaded"
+            );
+
+        }
+
+        if(infected >= 3) {
+
+            document.body.classList.add("glitch");
+
+            showBanner(
+                "CRITICAL NETWORK INSTABILITY DETECTED"
+            );
+
+        }
+
+        if(infected >= 5) {
+
+            firewallPopup(
+                "🔥 CORE FIREWALL FAILURE — TRAFFIC CONTAINMENT LOST"
+            );
+
+            showBanner(
+                "NETWORK CONTAINMENT FAILURE"
+            );
+
+        }
 
     }, 1500);
 
@@ -635,7 +681,64 @@ function activateLine(id) {
 
 }
 
-/* Infection timeline */
+function isolateNetwork() {
+
+    networkIsolated = true;
+
+    document.getElementById("isolateBtn")
+        .innerText = "NETWORK ISOLATED";
+
+    document.getElementById("isolateBtn")
+        .classList.add("active");
+
+    document.getElementById("traffic").innerText =
+        "BLOCKED";
+
+    showBanner(
+        "⚠️ Emergency isolation enabled — external spread blocked"
+    );
+
+    addAlert(
+        "🛡️ Firewall rules updated — infected devices quarantined"
+    );
+
+}
+
+function showBanner(text) {
+
+    const banner =
+        document.getElementById("system-banner");
+
+    banner.innerText = text;
+
+    banner.style.display = "block";
+
+    setTimeout(() => {
+
+        banner.style.display = "none";
+
+    }, 4000);
+
+}
+
+function firewallPopup(text) {
+
+    const popup =
+        document.createElement("div");
+
+    popup.className = "firewall-popup";
+
+    popup.innerHTML = text;
+
+    document.body.appendChild(popup);
+
+    setTimeout(() => {
+
+        popup.remove();
+
+    }, 5000);
+
+}
 
 function startInfection() {
 
@@ -705,9 +808,33 @@ function startInfection() {
             "🚨 NETWORK-WIDE OUTBREAK DETECTED — ISOLATE DEVICES IMMEDIATELY"
         );
 
+        firewallPopup(
+            "Emergency response system recommends immediate containment."
+        );
+
+        showBanner(
+            "CRITICAL OUTBREAK DETECTED"
+        );
+
     }, 15000);
 
 }
+
+setInterval(() => {
+
+    if(networkIsolated) {
+
+        addAlert(
+            "⚠️ Worm continues attempting propagation despite isolation"
+        );
+
+        firewallPopup(
+            "Blocked SMB replication attempt detected."
+        );
+
+    }
+
+}, 6000);
 
 </script>
 
