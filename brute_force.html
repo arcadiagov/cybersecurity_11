@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brute Force Attack Simulation</title>
+
+<style>
+
+body {
+    margin: 0;
+    background: #030303;
+    color: #00ff88;
+    font-family: Consolas, monospace;
+    overflow-x: hidden;
+}
+
+/* Animated background */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.02),
+            rgba(255,255,255,0.02) 1px,
+            transparent 2px,
+            transparent 4px
+        );
+    pointer-events: none;
+}
+
+/* Overlay */
+
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.96);
+    z-index: 999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay-box {
+    width: 90%;
+    max-width: 750px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0,255,100,0.15);
+}
+
+.overlay-box h1 {
+    color: #ff4444;
+    margin-top: 0;
+    font-size: 42px;
+}
+
+.overlay-box p {
+    color: #ccc;
+    line-height: 1.8;
+    font-size: 17px;
+}
+
+.overlay-box button {
+    margin-top: 25px;
+    background: #009944;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.overlay-box button:hover {
+    background: #00bb55;
+}
+
+/* Main content */
+
+.container {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.title {
+    font-size: 50px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #999;
+    margin-bottom: 40px;
+    font-size: 18px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.panel {
+    background: #0d0d0d;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 0 25px rgba(0,255,100,0.05);
+}
+
+/* Login */
+
+.login-box {
+    margin-top: 20px;
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    margin-bottom: 15px;
+    background: black;
+    border: 1px solid #333;
+    color: #00ff88;
+    font-size: 18px;
+    border-radius: 6px;
+}
+
+button {
+    background: #008f44;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #00aa55;
+}
+
+/* Terminal */
+
+#terminal {
+    height: 500px;
+    overflow-y: auto;
+    background: black;
+    border: 1px solid #222;
+    padding: 20px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    font-size: 15px;
+}
+
+/* Stats */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.stat {
+    background: #111;
+    border: 1px solid #222;
+    padding: 18px;
+    border-radius: 8px;
+}
+
+.stat-title {
+    color: #888;
+    font-size: 14px;
+}
+
+.stat-value {
+    margin-top: 8px;
+    color: white;
+    font-size: 24px;
+}
+
+/* Security Meter */
+
+.meter {
+    margin-top: 25px;
+    height: 28px;
+    background: #222;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.fill {
+    height: 100%;
+    width: 0%;
+    transition: 1.5s ease;
+}
+
+/* Result */
+
+#result {
+    margin-top: 25px;
+    padding: 25px;
+    border-left: 5px solid red;
+    background: #1a0000;
+    display: none;
+}
+
+#result h2 {
+    margin-top: 0;
+    color: #ff5555;
+}
+
+/* Footer */
+
+.footer {
+    margin-top: 40px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Responsive */
+
+@media(max-width:1000px){
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<!-- Educational Overlay -->
+
+<div id="overlay">
+
+    <div class="overlay-box">
+
+        <h1>Educational Brute Force Simulation</h1>
+
+        <p>
+            This simulation demonstrates how weak passwords may be guessed through automated password attacks known as brute force attacks.
+        </p>
+
+        <p>
+            No real password cracking, hacking, or network activity is performed. This page is designed strictly for cybersecurity education and awareness.
+        </p>
+
+        <button onclick="startPage()">
+            I Understand
+        </button>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <div class="title">
+        Brute Force Attack Simulator
+    </div>
+
+    <div class="subtitle">
+        Educational visualization of password security and automated guessing attacks.
+    </div>
+
+    <div class="grid">
+
+        <!-- Left Side -->
+
+        <div class="panel">
+
+            <h2 style="color:white;">
+                Login Target
+            </h2>
+
+            <div class="login-box">
+
+                <input type="text" value="customer@email.com">
+
+                <input type="password" id="passwordInput" placeholder="Enter a password to test">
+
+                <button onclick="startAttack()">
+                    Simulate Attack
+                </button>
+
+            </div>
+
+            <div class="stats">
+
+                <div class="stat">
+                    <div class="stat-title">
+                        Attack Type
+                    </div>
+                    <div class="stat-value" id="attackType">
+                        Idle
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-title">
+                        Passwords/sec
+                    </div>
+                    <div class="stat-value" id="speed">
+                        0
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-title">
+                        Attempts
+                    </div>
+                    <div class="stat-value" id="attempts">
+                        0
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-title">
+                        Estimated Crack Time
+                    </div>
+                    <div class="stat-value" id="time">
+                        --
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="meter">
+                <div class="fill" id="fill"></div>
+            </div>
+
+            <div id="result">
+
+                <h2>Password Security Assessment</h2>
+
+                <p id="assessment"></p>
+
+                <p id="recommendations"></p>
+
+            </div>
+
+        </div>
+
+        <!-- Right Side -->
+
+        <div class="panel">
+
+            <h2 style="color:white;">
+                Live Brute Force Feed
+            </h2>
+
+            <div id="terminal"></div>
+
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Cybersecurity Awareness Simulation — Educational Use Only
+    </div>
+
+</div>
+
+<script>
+
+function startPage() {
+
+    document.getElementById("overlay").style.display = "none";
+
+}
+
+function randomString(length) {
+
+    const chars =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+
+    let result = "";
+
+    for(let i = 0; i < length; i++) {
+
+        result += chars.charAt(
+            Math.floor(Math.random() * chars.length)
+        );
+
+    }
+
+    return result;
+
+}
+
+function startAttack() {
+
+    const password =
+        document.getElementById("passwordInput").value;
+
+    const terminal =
+        document.getElementById("terminal");
+
+    terminal.innerHTML = "";
+
+    document.getElementById("result").style.display = "none";
+
+    let score = 0;
+
+    if(password.length >= 8) score += 20;
+    if(password.length >= 12) score += 20;
+    if(/[A-Z]/.test(password)) score += 15;
+    if(/[a-z]/.test(password)) score += 15;
+    if(/[0-9]/.test(password)) score += 15;
+    if(/[^A-Za-z0-9]/.test(password)) score += 15;
+
+    let attempts = 0;
+
+    document.getElementById("attackType").innerText =
+        "Hybrid Attack";
+
+    const attackInterval = setInterval(() => {
+
+        attempts += Math.floor(Math.random() * 4000000);
+
+        document.getElementById("attempts").innerText =
+            attempts.toLocaleString();
+
+        document.getElementById("speed").innerText =
+            (Math.floor(Math.random() * 9000000) + 1000000).toLocaleString();
+
+        const fakeAttempt =
+            randomString(password.length || 8);
+
+        terminal.innerHTML +=
+            "[ATTEMPT " + attempts.toLocaleString() + "] " +
+            fakeAttempt + "<br>";
+
+        terminal.scrollTop =
+            terminal.scrollHeight;
+
+    }, 50);
+
+    setTimeout(() => {
+
+        clearInterval(attackInterval);
+
+        const fill =
+            document.getElementById("fill");
+
+        const result =
+            document.getElementById("result");
+
+        result.style.display = "block";
+
+        if(score >= 85) {
+
+            fill.style.width = "100%";
+            fill.style.background = "#00cc66";
+
+            document.getElementById("time").innerText =
+                "Centuries+";
+
+            document.getElementById("assessment").innerHTML =
+                "<strong>Very Strong Password</strong><br><br>This password demonstrates strong resistance to brute force attacks due to its complexity, length, and character diversity.";
+
+            document.getElementById("recommendations").innerHTML =
+                "Recommendation: Continue using unique passwords and enable multi-factor authentication.";
+
+            terminal.innerHTML +=
+                "<br><span style='color:#00ff88;'>ATTACK FAILED — PASSWORD RESISTANCE TOO HIGH</span>";
+
+        }
+
+        else if(score >= 60) {
+
+            fill.style.width = "70%";
+            fill.style.background = "#99cc00";
+
+            document.getElementById("time").innerText =
+                "Years";
+
+            document.getElementById("assessment").innerHTML =
+                "<strong>Moderately Strong Password</strong><br><br>This password would resist many automated attacks but may still be vulnerable to advanced cracking techniques.";
+
+            document.getElementById("recommendations").innerHTML =
+                "Recommendation: Add additional symbols and increase length.";
+
+            terminal.innerHTML +=
+                "<br><span style='color:yellow;'>HIGH COMPUTATIONAL RESISTANCE DETECTED</span>";
+
+        }
+
+        else {
+
+            fill.style.width = "30%";
+            fill.style.background = "red";
+
+            document.getElementById("time").innerText =
+                "Seconds to Hours";
+
+            document.getElementById("assessment").innerHTML =
+                "<strong>Weak Password Detected</strong><br><br>This password may be vulnerable to dictionary attacks and brute force guessing due to limited complexity.";
+
+            document.getElementById("recommendations").innerHTML =
+                "Recommendation: Use uppercase letters, lowercase letters, symbols, numbers, and longer passwords.";
+
+            terminal.innerHTML +=
+                "<br><span style='color:red;'>PASSWORD COMPROMISED</span>";
+
+        }
+
+    }, 7000);
+
+}
+
+</script>
+
+</body>
+</html>
