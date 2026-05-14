@@ -271,7 +271,114 @@ body::before {
     }
 
 }
+/* ADD THIS TO YOUR CSS */
 
+#isolateBtn {
+    background: #b30000;
+    color: white;
+    border: none;
+    padding: 14px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    transition: 0.2s;
+    box-shadow: 0 0 15px rgba(255,0,0,0.4);
+}
+
+#isolateBtn:hover {
+    background: #e00000;
+}
+
+#isolateBtn.active {
+    background: #007a33;
+    box-shadow: 0 0 20px rgba(0,255,100,0.5);
+}
+
+/* Firewall status popups */
+
+.firewall-popup {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    width: 340px;
+    background: rgba(20,20,20,0.96);
+    border-left: 5px solid orange;
+    padding: 15px;
+    color: white;
+    font-size: 14px;
+    z-index: 999999;
+    animation: popupSlide 0.4s ease;
+    margin-top: 12px;
+}
+
+@keyframes popupSlide {
+
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+}
+
+/* System banner */
+
+#system-banner {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(120,0,0,0.92);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    display: none;
+    z-index: 999999;
+    box-shadow: 0 0 25px rgba(255,0,0,0.5);
+}
+
+/* Screen glitch */
+
+.glitch {
+
+    animation: screenGlitch 0.18s infinite;
+
+}
+
+@keyframes screenGlitch {
+
+    0% {
+        transform: translate(0px,0px);
+    }
+
+    20% {
+        transform: translate(-2px,1px);
+    }
+
+    40% {
+        transform: translate(2px,-1px);
+    }
+
+    60% {
+        transform: translate(-1px,2px);
+    }
+
+    80% {
+        transform: translate(1px,-2px);
+    }
+
+    100% {
+        transform: translate(0px,0px);
+    }
+
+}
 </style>
 </head>
 <body>
@@ -303,7 +410,11 @@ body::before {
 <!-- HUD -->
 
 <div class="hud">
+<!-- ADD THIS BUTTON INSIDE THE .hud DIV -->
 
+<button id="isolateBtn" onclick="isolateNetwork()">
+    ISOLATE DEVICES
+</button>
     <div class="hud-box">
         <div class="hud-title">
             Devices Infected
