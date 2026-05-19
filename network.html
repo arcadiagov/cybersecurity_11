@@ -123,6 +123,7 @@ let backupMode = false;
 let isBackingUp = false;
 let isMutated = false; // Idea 5
 let logs = []; // Idea 6
+let virusHasHit = false;
 
 const chatSafe = ["Checking email...", "Compiling project...", "Zoom meeting in 5m", "Saving changes...", "Is the internet slow?"];
 const chatInfected = ["MY FILES ARE GONE!", "WHAT IS THIS LOCK?!", "System Error 404", "I CAN'T LOG IN!", "HELP!!"];
@@ -302,6 +303,21 @@ function triggerSystemFailure() {
     `;
 }
 
+function triggerSystemSuccess() {
+    systemFailed = true;
+    addLog("SUCCESS: Threat completely eradicated. All nodes verified sanitized.");
+    document.body.innerHTML = `
+        <div style="background:#003311; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:monospace; text-align:center; padding: 20px;">
+            <h1 style="font-size:60px; color: #00ff66;">CONGRATULATIONS</h1>
+            <p style="font-size:24px;">NETWORK FULLY SANITIZED</p>
+            <div style="display:flex; gap: 20px;">
+                <button onclick="downloadLogs()" style="padding:15px 30px; background:#0088ff; color:white; border:none; cursor:pointer; font-weight:bold;">DOWNLOAD INCIDENT REPORT</button>
+                <button onclick="location.reload()" style="padding:15px 30px; background:white; color:black; border:none; cursor:pointer; font-weight:bold;">REBOOT SIMULATION</button>
+            </div>
+        </div>
+    `;
+}
+
 function infect(nodeId, text) {
     if (systemFailed) return;
     const node = document.getElementById(nodeId);
@@ -316,7 +332,9 @@ function infect(nodeId, text) {
             node.classList.remove('warning');
             node.classList.add(isMutated ? 'mutated' : 'infected'); // Apply mutation visual if active
             node.querySelector('.icon').innerText = '🔒';
-            infectedCount++; updateStats();
+            infectedCount++; 
+            virusHasHit = true;
+            updateStats();
             addLog(`INFECTION: ${node.querySelector('.label').innerText} is now encrypted.`);
 
             if (nodeId === 'n13') {
@@ -358,6 +376,12 @@ function recoverNode(nodeId) {
 function updateStats() {
     if(systemFailed) return;
     document.getElementById("infectedCount").innerText = infectedCount;
+    
+    if (virusHasHit && infectedCount === 0) {
+        triggerSystemSuccess();
+        return;
+    }
+
     const threat = document.getElementById("threat");
     if (infectedCount >= 8) { threat.innerText = "CRITICAL"; document.body.classList.add("glitch"); }
     else if (infectedCount >= 4) { threat.innerText = "HIGH"; document.body.classList.remove("glitch"); }
