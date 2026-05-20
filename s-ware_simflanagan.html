@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spyware Simulation</title>
+
+    <style>
+        body {
+            margin: 0;
+            background-color: black;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* First screen */
+        #capture-screen {
+            position: fixed;
+            inset: 0;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        #capture-screen h1 {
+            color: #444;
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        #timer {
+            color: #777;
+            font-size: 22px;
+        }
+
+        /* Main content */
+        .content {
+            display: none;
+            padding: 40px;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .keylog-box {
+            background-color: #111;
+            border: 2px solid #ff4d4d;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0 0 20px rgba(255,0,0,0.2);
+        }
+
+        .keylog-box h2 {
+            color: #ff4d4d;
+            margin-top: 0;
+            font-size: 32px;
+        }
+
+        #logged-keys {
+            color: #00ff88;
+            font-size: 24px;
+            word-wrap: break-word;
+            min-height: 80px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .lesson {
+            background-color: #161616;
+            padding: 35px;
+            border-radius: 12px;
+        }
+
+        .lesson h1 {
+            color: #ff5a5a;
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        .lesson p {
+            font-size: 21px;
+            line-height: 1.9;
+            color: #dddddd;
+        }
+
+        .highlight {
+            color: #ff5a5a;
+            font-weight: bold;
+        }
+
+        .links {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: white;
+            background-color: #a30000;
+            padding: 14px 24px;
+            border-radius: 6px;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .links a:hover {
+            background-color: #d10000;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Initial blank capture screen -->
+    <div id="capture-screen">
+
+        <h1>Type Something Random</h1>
+
+        <div id="timer">
+            Recording Keystrokes...
+        </div>
+
+    </div>
+
+    <!-- Main lesson content -->
+    <div class="content" id="main-content">
+
+        <div class="keylog-box">
+
+            <h2>Captured Keystrokes</h2>
+
+            <div id="logged-keys"></div>
+
+        </div>
+
+        <div class="lesson">
+
+            <h1>Spyware & Keylogging Explained</h1>
+
+            <p>
+                <span class="highlight">Keylogging</span> is a type of spyware where a malicious program or application is installed on a device, and every keystroke entered into the computer is secretly recorded and sent to an attacker.
+            </p>
+
+            <p>
+                This can be extremely dangerous because attackers may quickly gather passwords, banking information, personal messages, and other sensitive information.
+            </p>
+
+            <p>
+                Stolen information may be sold, ransomed, or shared with other malicious organizations and can result in unauthorized access to accounts such as email, banking, and social media.
+            </p>
+
+            <p>
+                Spyware is commonly downloaded through phishing emails, Trojan horses, fake downloads, malicious advertisements, or suspicious links.
+            </p>
+
+            <p>
+                If you suspect your computer has been infected, contact a reputable IT support company or cybersecurity professional to help remove the malware from your device.
+            </p>
+
+            <p>
+                Always be cautious when downloading files or clicking links from unknown sources.
+            </p>
+
+            <div class="links">
+
+                <a href="v-ware_sim.html">Virus</a>
+
+                <a href="w-ware_sim.html">Worm</a>
+                
+                <a href="r-ware_sim.html">Ransomware</a>
+                
+                <a href="t-ware_sim.html">Trojan Horse</a>
+
+
+
+            </div>
+
+            <div class="footer">
+                Cybersecurity Awareness Simulation Project
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        let capturedKeys = "";
+
+        // Record keys during black screen
+        document.addEventListener("keydown", function(event) {
+
+            if (event.key.length === 1) {
+                capturedKeys += event.key;
+            } else if (event.key === " ") {
+                capturedKeys += " ";
+            } else if (event.key === "Enter") {
+                capturedKeys += "\n";
+            }
+
+        });
+
+        // After 10 seconds reveal page
+        setTimeout(() => {
+
+            document.getElementById("capture-screen").style.display = "none";
+
+            document.getElementById("main-content").style.display = "block";
+
+            document.getElementById("logged-keys").textContent = capturedKeys;
+
+        }, 10000);
+
+        // Continue logging keys on second page
+        document.addEventListener("keydown", function(event) {
+
+            let display = document.getElementById("logged-keys");
+
+            if (!display) return;
+
+            if (event.key.length === 1) {
+                display.textContent += event.key;
+            } else if (event.key === " ") {
+                display.textContent += " ";
+            } else if (event.key === "Enter") {
+                display.textContent += "\n";
+            }
+
+        });
+
+    </script>
+<div class="admin-terminal-bar">
+    <div class="admin-telemetry">
+        <span class="admin-pulse-indicator"></span>
+        <span class="admin-status-text">AUTH_OK // WELCOME BACK MR FLANAGAN</span>
+        <span class="admin-divider">|</span>
+        <span class="admin-node">NODE: OVERRIDE_MATRIX_CONNECTED</span>
+    </div>
+    
+    <a href="flanagan.html" class="admin-return-btn">
+        <span class="btn-bracket">[</span> RETURN TO COMMAND CENTER <span class="btn-bracket">]</span>
+    </a>
+</div>
+
+<style>
+    /* Pinned Terminal Container */
+    .admin-terminal-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 45px;
+        background: rgba(3, 10, 15, 0.95);
+        border-top: 1px solid #00ffcc;
+        box-shadow: 0 -5px 20px rgba(0, 255, 204, 0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 25px;
+        font-family: 'Courier New', Courier, monospace;
+        z-index: 9999999; /* Ensures it floats above everything else */
+        box-sizing: border-box;
+    }
+
+    /* Telemetry Data Style */
+    .admin-telemetry {
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        color: #88a0b0;
+        letter-spacing: 1px;
+    }
+
+    /* Flashing Status Light */
+    .admin-pulse-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: #00ffcc;
+        border-radius: 50%;
+        margin-right: 12px;
+        box-shadow: 0 0 8px #00ffcc;
+        animation: adminBlink 1.5s infinite;
+    }
+
+    .admin-status-text {
+        color: #ffffff;
+        font-weight: bold;
+        text-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+    }
+
+    .admin-divider {
+        margin: 0 15px;
+        color: #00ffcc;
+        opacity: 0.5;
+    }
+
+    .admin-node {
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    /* Terminal Action Button */
+    .admin-return-btn {
+        color: #00ffcc;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+
+    .btn-bracket {
+        color: #88a0b0;
+        transition: color 0.3s ease;
+    }
+
+    /* Interactive Hover State */
+    .admin-return-btn:hover {
+        color: #ffffff;
+        text-shadow: 0 0 8px #00ffcc;
+        background: rgba(0, 255, 204, 0.1);
+    }
+
+    .admin-return-btn:hover .btn-bracket {
+        color: #00ffcc;
+    }
+
+    /* Keyframe animation for the diagnostic pulse */
+    @keyframes adminBlink {
+        0%, 100% { opacity: 0.3; transform: scale(0.9); }
+        50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 12px #00ffcc; }
+    }
+
+    /* Adjust page body padding automatically so the footer never covers real content */
+    body {
+        padding-bottom: 55px !important;
+    }
+</style>
+</body>
+</html>
