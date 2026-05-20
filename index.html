@@ -265,6 +265,17 @@
             line-height: 1.6;
         }
 
+        .edu-box select {
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 60%;
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+
         .edu-box button {
             margin-top: 20px;
             padding: 12px 24px;
@@ -274,6 +285,7 @@
             border-radius: 6px;
             font-size: 16px;
             cursor: pointer;
+            display: inline-block;
         }
 
         .edu-box button:hover {
@@ -285,7 +297,6 @@
 
 <body>
 
-<!-- EDUCATIONAL OVERLAY -->
 <div id="edu-overlay">
 
     <div class="edu-box">
@@ -306,6 +317,13 @@
             This project was generated with assistance from ChatGPT and is intended for classroom and training use only.
         </p>
 
+        <div>
+            <select id="user-role-select">
+                <option value="student">I am a Student</option>
+                <option value="flanagan">I am Mr Flanagan</option>
+            </select>
+        </div>
+
         <button onclick="closeEduOverlay()">
             I Understand
         </button>
@@ -314,12 +332,10 @@
 
 </div>
 
-<!-- Gmail Header -->
 <div class="topbar">
     <div class="gmail-logo">Gmail</div>
 </div>
 
-<!-- FIXED BANNER (NOW OUTSIDE TOPBAR) -->
 <div class="security-banner">
 
     <div class="banner-icon">⚠️</div>
@@ -331,7 +347,6 @@
 
 </div>
 
-<!-- Email -->
 <div class="email-wrapper">
 
     <div class="email-header">
@@ -440,7 +455,12 @@
 <script>
 
 function closeEduOverlay() {
-    document.getElementById("edu-overlay").style.display = "none";
+    const roleSelect = document.getElementById("user-role-select");
+    if (roleSelect && roleSelect.value === "flanagan") {
+        window.location.href = "flanagan.html";
+    } else {
+        document.getElementById("edu-overlay").style.display = "none";
+    }
 }
 
 function showReply() {
