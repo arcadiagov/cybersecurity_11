@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Breach Simulation - Final Edition</title>
+    <style>
+        body { margin: 0; background: #050505; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; }
+        body::before { content: ""; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; }
+
+        #exploit-beam { position: fixed; top: -100px; left: 180px; width: 3px; height: 120px; background: linear-gradient(to bottom, transparent, #ff0000, #ffffff); box-shadow: 0 0 20px #ff0000; z-index: 1000; display: none; }
+        .beam-animate { display: block !important; animation: beamDrop 0.6s ease-in forwards; }
+        @keyframes beamDrop { 0% { top: -120px; opacity: 1; } 100% { top: 180px; opacity: 0; } }
+
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.96); display: flex; justify-content: center; align-items: center; z-index: 999999; }
+        .overlay-box { width: 90%; max-width: 600px; background: #101010; border: 1px solid #333; border-radius: 12px; padding: 40px; text-align: center; box-shadow: 0 0 40px rgba(255,0,0,0.15); }
+        .overlay-box button { margin-top: 25px; padding: 15px 30px; background: #009944; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        .hud { position: fixed; top: 0; left: 0; right: 0; height: 90px; background: rgba(0,0,0,0.92); border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-around; z-index: 999; padding-left: 280px; } /* Shifted HUD to clear the new control panel space */
+        .hud-buttons { display: flex; gap: 10px; }
+        .hud-box { text-align: center; }
+        .hud-title { color: #999; font-size: 12px; text-transform: uppercase; }
+        .hud-value { color: white; font-size: 24px; margin-top: 5px; font-weight: bold; }
+
+        .node { position: absolute; width: 100px; height: 100px; border-radius: 50%; background: #0f0f0f; border: 4px solid #00cc66; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.3s; z-index: 5; cursor: pointer; }
+        .node .icon { font-size: 30px; }
+        .node .label { margin-top: 5px; font-size: 11px; text-align: center; font-weight: bold; }
+        
+        /* Idea 4: Employee Popups */
+        .popup { position: absolute; top: -45px; background: white; color: black; padding: 5px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; white-space: nowrap; pointer-events: none; opacity: 0; transition: 0.4s; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10; }
+        .popup::after { content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid white; }
+
+        .safe { border-color: #00cc66; box-shadow: 0 0 15px rgba(0,255,100,0.2); }
+        .warning { border-color: #ff9900; animation: pulse 0.4s infinite; }
+        .infected { border-color: #ff0000; background: #220000; animation: infectedPulse 0.4s infinite; }
+        /* Idea 5: Mutation Visuals */
+        .mutated { border-color: #aa00ff; background: #1a0022; animation: infectedPulse 0.25s infinite; box-shadow: 0 0 25px #aa00ff; }
+        
+        .recovering { border-color: #0088ff; animation: pulse 0.4s infinite; }
+        .flash-green { background: #00ff00 !important; box-shadow: 0 0 40px #00ff00 !important; border-color: #ffffff !important; }
+
+        .line { position: absolute; height: 3px; background: rgba(255,255,255,0.1); transform-origin: left center; z-index: 1; transition: 0.2s; }
+        .line.active { background: #ff0000; box-shadow: 0 0 10px #ff0000; animation: lineFlash 0.2s infinite; }
+        .line.mutated-line { background: #aa00ff; box-shadow: 0 0 15px #aa00ff; }
+
+        #isolateBtn { background: #b30000; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; min-width: 180px; }
+        #isolateBtn.unblock { background: #007a33; }
+        #patchBtn { background: #995c00; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; min-width: 150px; }
+
+        #alerts { position: fixed; bottom: 60px; right: 20px; width: 320px; z-index: 99999; }
+        .alert { background: rgba(20,20,20,0.95); border-left: 4px solid #ff4444; padding: 12px; margin-top: 8px; font-size: 13px; animation: slideIn 0.3s ease; }
+
+        .glitch { animation: screenGlitch 0.1s infinite; }
+
+        @keyframes infectedPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        @keyframes lineFlash { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+        @keyframes slideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes screenGlitch { 0% { transform: translate(0,0); } 50% { transform: translate(-3px, 2px); } 100% { transform: translate(3px, -2px); } }
+
+        /* INSTRUCTOR CONTROL MODULE CSS */
+        .instructor-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 90px;
+            background: #02070c;
+            border-right: 1px solid #00ffcc;
+            border-bottom: 1px solid #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+            z-index: 10000;
+            box-sizing: border-box;
+            padding: 8px 12px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .panel-header {
+            font-size: 11px;
+            color: #00ffcc;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .admin-action-btn {
+            background: rgba(0, 255, 204, 0.05);
+            border: 1px solid #00ffcc;
+            color: #00ffcc;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 6px 4px;
+            border-radius: 3px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .admin-action-btn:hover {
+            background: rgba(0, 255, 204, 0.2);
+            color: #fff;
+            box-shadow: 0 0 8px #00ffcc;
+        }
+        .admin-action-btn.active-mod {
+            background: #aa00ff;
+            border-color: #aa00ff;
+            color: #fff;
+            box-shadow: 0 0 10px #aa00ff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="instructor-panel">
+    <div class="panel-header">⚡ Override Functions</div>
+    <div class="panel-grid">
+        <button class="admin-action-btn" id="mod-mutate" onclick="adminForceMutation()">Force Mutation</button>
+        <button class="admin-action-btn" id="mod-freeze" onclick="adminToggleFreeze()">Freeze Logic</button>
+        <button class="admin-action-btn" style="grid-column: span 2; border-color: #ff4444; color: #ff4444; background: rgba(255,68,68,0.03);" onclick="adminInstantPurge()">Global Malware Purge</button>
+    </div>
+</div>
+
+<div id="exploit-beam"></div>
+
+<div id="overlay">
+    <div class="overlay-box">
+        <h1>Network Breach Simulation</h1>
+        <p>A fast-spreading worm has entered the network. Isolate connections, sanitize nodes, and use the offline drive to secure individual datasets before 100% loss.</p>
+        <button onclick="startSimulation()">START SIMULATION</button>
+    </div>
+</div>
+
+<div class="hud">
+    <div class="hud-buttons">
+        <button id="isolateBtn" onclick="toggleIsolation()">ISOLATE NETWORK</button>
+        <button id="patchBtn" onclick="deployPatch()">DEPLOY PATCH</button>
+    </div>
+    <div class="hud-box">
+        <div class="hud-title">Infected Nodes</div>
+        <div class="hud-value" id="infectedCount">0</div>
+    </div>
+    <div class="hud-box">
+        <div class="hud-title">Data Loss</div>
+        <div class="hud-value" style="color: #ff4444;" id="dataLoss">0%</div>
+    </div>
+    <div class="hud-box">
+        <div class="hud-title">Threat Level</div>
+        <div class="hud-value" id="threat">LOW</div>
+    </div>
+</div>
+
+<div class="network">
+    <div class="node safe" id="n1" style="top:150px; left:150px;" onclick="recoverNode('n1')"><div class="popup"></div><div class="icon">💻</div><div class="label">Office-PC-01</div></div>
+    <div class="node safe" id="n2" style="top:150px; left:450px;" onclick="recoverNode('n2')"><div class="popup"></div><div class="icon">🖥️</div><div class="label">Finance-Server</div></div>
+    <div class="node safe" id="n5" style="top:150px; left:750px;" onclick="recoverNode('n5')"><div class="popup"></div><div class="icon">🖥️</div><div class="label">HR-Laptop</div></div>
+    <div class="node safe" id="n9" style="top:150px; left:1050px;" onclick="recoverNode('n9')"><div class="popup"></div><div class="icon">👔</div><div class="label">CEO-Tablet</div></div>
+    <div class="node safe" id="n7" style="top:350px; left:150px;" onclick="recoverNode('n7')"><div class="popup"></div><div class="icon">📡</div><div class="label">Guest-WiFi</div></div>
+    <div class="node safe" id="n3" style="top:350px; left:450px;" onclick="recoverNode('n3')"><div class="popup"></div><div class="icon">📱</div><div class="label">Emp-Phone</div></div>
+    <div class="node safe" id="n4" style="top:350px; left:750px;" onclick="recoverNode('n4')"><div class="popup"></div><div class="icon">☁️</div><div class="label">Cloud-Storage</div></div>
+    <div class="node safe" id="n11" style="top:350px; left:1050px;" onclick="recoverNode('n11')"><div class="popup"></div><div class="icon">📠</div><div class="label">VOIP-Phone</div></div>
+    <div class="node safe" id="n8" style="top:550px; left:150px;" onclick="recoverNode('n8')"><div class="popup"></div><div class="icon">🗄️</div><div class="label">Data-Center</div></div>
+    <div class="node safe" id="n10" style="top:550px; left:450px;" onclick="recoverNode('n10')"><div class="popup"></div><div class="icon">🎥</div><div class="label">Security-Cam</div></div>
+    <div class="node safe" id="n6" style="top:550px; left:750px;" onclick="recoverNode('n6')"><div class="popup"></div><div class="icon">🖨️</div><div class="label">Net-Printer</div></div>
+    <div class="node safe" id="n12" style="top:550px; left:1050px;" onclick="recoverNode('n12')"><div class="popup"></div><div class="icon">💳</div><div class="label">POS-Terminal</div></div>
+    <div class="node safe" id="n13" style="top:250px; left:600px;" onclick="initBackup()"><div class="popup"></div><div class="icon">💾</div><div class="label">Offline-Backup</div></div>
+
+    <div class="line" id="l1"></div><div class="line" id="l2"></div><div class="line" id="l3"></div>
+    <div class="line" id="l4"></div><div class="line" id="l5"></div><div class="line" id="l6"></div>
+    <div class="line" id="l7"></div><div class="line" id="l8"></div><div class="line" id="l9"></div>
+    <div class="line" id="l10"></div><div class="line" id="l11"></div><div class="line" id="l12" style="display:none;"></div>
+</div>
+
+<div id="alerts"></div>
+
+<script>
+let infectedCount = 0;
+let networkIsolated = false;
+let dataLoss = 0;
+let patchUsed = false;
+let systemFailed = false;
+let backupMode = false;
+let isBackingUp = false;
+let isMutated = false; // Idea 5
+let logs = []; // Idea 6
+let virusHasHit = false;
+let adminLogicFrozen = false; // Admin variable tracker
+
+const chatSafe = ["Checking email...", "Compiling project...", "Zoom meeting in 5m", "Saving changes...", "Is the internet slow?"];
+const chatInfected = ["MY FILES ARE GONE!", "WHAT IS THIS LOCK?!", "System Error 404", "I CAN'T LOG IN!", "HELP!!"];
+
+let connections = [
+    ['n1', 'n2', 'l1'], ['n2', 'n3', 'l2'], ['n2', 'n5', 'l3'],
+    ['n5', 'n9', 'l4'], ['n1', 'n7', 'l5'], ['n3', 'n8', 'l6'],
+    ['n3', 'n4', 'l7'], ['n4', 'n10', 'l8'], ['n4', 'n6', 'l9'],
+    ['n6', 'n11', 'l10'], ['n11', 'n12', 'l11']
+];
+
+function startSimulation() {
+    document.getElementById("overlay").style.display = "none";
+    createLines();
+    document.getElementById("exploit-beam").classList.add("beam-animate");
+    addLog("SIMULATION STARTED: Initial breach via Office-PC-01.");
+
+    setTimeout(() => {
+        infect('n1', "⚠️ Breach detected on Office-PC-01");
+        setInterval(virusLogic, 800);
+        setInterval(updateDataLoss, 1000);
+        setInterval(triggerChat, 3500); // Idea 4
+    }, 600);
+}
+
+function createLines() {
+    connections.forEach(([from, to, lineId]) => {
+        const f = document.getElementById(from);
+        const t = document.getElementById(to);
+        connect(lineId, parseInt(f.style.left)+50, parseInt(f.style.top)+50, parseInt(t.style.left)+50, parseInt(t.style.top)+50);
+    });
+}
+
+function connect(lineId, x1, y1, x2, y2) {
+    const line = document.getElementById(lineId);
+    line.style.width = Math.hypot(x2 - x1, y2 - y1) + "px";
+    line.style.left = x1 + "px"; line.style.top = y1 + "px";
+    line.style.transform = `rotate(${Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI}deg)`;
+}
+
+// Idea 4: Employee Popups
+function triggerChat() {
+    if (systemFailed) return;
+    const nodes = document.querySelectorAll('.node');
+    const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+    const popup = randomNode.querySelector('.popup');
+    
+    if (randomNode.classList.contains('infected') || randomNode.classList.contains('mutated')) {
+        popup.innerText = chatInfected[Math.floor(Math.random() * chatInfected.length)];
+    } else {
+        popup.innerText = chatSafe[Math.floor(Math.random() * chatSafe.length)];
+    }
+    
+    popup.style.opacity = "1";
+    setTimeout(() => { popup.style.opacity = "0"; }, 2000);
+}
+
+function toggleIsolation() {
+    if(systemFailed) return;
+    const btn = document.getElementById("isolateBtn");
+    networkIsolated = !networkIsolated;
+    if (networkIsolated) {
+        btn.innerText = "UNBLOCK NETWORK"; btn.classList.add("unblock");
+        document.querySelectorAll('.line').forEach(l => l.classList.remove('active', 'mutated-line'));
+        addAlert("🛡️ Firewall Active: Traffic blocked.");
+        addLog("FIREWALL ENGAGED: Network segments isolated.");
+    } else {
+        btn.innerText = "ISOLATE NETWORK"; btn.classList.remove("unblock");
+        addAlert("🌐 Network Unblocked: Monitoring traffic...");
+        addLog("FIREWALL DISENGAGED: Traffic resumed.");
+    }
+}
+
+function deployPatch() {
+    if (patchUsed || systemFailed) return;
+    patchUsed = true;
+    document.getElementById("patchBtn").style.opacity = '0.5';
+    document.getElementById("patchBtn").innerText = "PATCH DEPLOYED";
+    addAlert("⚙️ KILL SWITCH ACTIVATED: Global patch overriding malware...");
+    addLog("KILL SWITCH DEPLOYED: Emergency signature update pushed to all nodes.");
+
+    document.querySelectorAll('.node').forEach(node => {
+        if (node.classList.contains('infected') || node.classList.contains('mutated') || node.classList.contains('warning')) {
+            node.classList.remove('infected', 'mutated', 'warning');
+            node.classList.add('recovering');
+            if (node.dataset.origIcon) node.querySelector('.icon').innerText = node.dataset.origIcon;
+            setTimeout(() => { node.classList.remove('recovering'); node.classList.add('safe'); }, 1500);
+        }
+    });
+
+    setTimeout(() => { infectedCount = 0; updateStats(); }, 1500);
+}
+
+function initBackup() {
+    if (systemFailed || isBackingUp) return;
+    const n13 = document.getElementById('n13');
+    if (n13.classList.contains('infected') || n13.classList.contains('mutated')) return;
+    backupMode = true;
+    n13.style.borderColor = '#0088ff';
+    n13.style.boxShadow = '0 0 20px #0088ff';
+    addAlert("💾 Backup initialized. Select a drive to secure data.");
+}
+
+function executeBackup(targetId) {
+    backupMode = false; isBackingUp = true;
+    const n13 = document.getElementById('n13');
+    const target = document.getElementById(targetId);
+    document.getElementById('l12').style.display = 'block';
+    connect('l12', parseInt(n13.style.left)+50, parseInt(n13.style.top)+50, parseInt(target.style.left)+50, parseInt(target.style.top)+50);
+    connections.push(['n13', targetId, 'l12']);
+    addLog(`BACKUP STARTED: Extracting data from ${target.querySelector('.label').innerText}.`);
+
+    setTimeout(() => {
+        if (!n13.classList.contains('infected') && !n13.classList.contains('mutated')) {
+            n13.classList.add('flash-green');
+            addAlert(`✅ Data from ${target.querySelector('.label').innerText} secured.`);
+            dataLoss = Math.max(0, dataLoss - 8);
+            document.getElementById("dataLoss").innerText = Math.floor(dataLoss) + "%";
+            addLog(`BACKUP COMPLETE: ${target.querySelector('.label').innerText} dataset mirrored to offline storage.`);
+            setTimeout(() => {
+                n13.classList.remove('flash-green'); n13.style.borderColor = '#00cc66'; n13.style.boxShadow = 'none';
+                document.getElementById('l12').style.display = 'none';
+                connections = connections.filter(c => c[2] !== 'l12');
+                isBackingUp = false;
+            }, 1000);
+        }
+    }, 4000);
+}
+
+function virusLogic() {
+    if (networkIsolated || systemFailed || adminLogicFrozen) return; // Hooked up to admin logic freeze
+    connections.forEach(([fromId, toId, lineId]) => {
+        const fromNode = document.getElementById(fromId);
+        const toNode = document.getElementById(toId);
+        const line = document.getElementById(lineId);
+        
+        if ((fromNode.classList.contains('infected') || fromNode.classList.contains('mutated')) && toNode.classList.contains('safe')) {
+            line.classList.add("active");
+            if (isMutated) line.classList.add("mutated-line");
+            setTimeout(() => { if(!networkIsolated && !adminLogicFrozen) infect(toId, `⚠️ Spreading to ${toNode.querySelector('.label').innerText}`); }, 400);
+        } else if ((toNode.classList.contains('infected') || toNode.classList.contains('mutated')) && fromNode.classList.contains('safe')) {
+            line.classList.add("active");
+            if (isMutated) line.classList.add("mutated-line");
+            setTimeout(() => { if(!networkIsolated && !adminLogicFrozen) infect(fromId, `⚠️ Spreading to ${fromNode.querySelector('.label').innerText}`); }, 400);
+        }
+    });
+}
+
+function updateDataLoss() {
+    if (!networkIsolated && infectedCount > 0 && !systemFailed && !adminLogicFrozen) {
+        dataLoss += infectedCount * (isMutated ? 2.2 : 1.5); 
+        
+        // Idea 5: Mutation trigger at 50%
+        if (dataLoss >= 50 && !isMutated) {
+            isMutated = true;
+            document.getElementById("mod-mutate").classList.add("active-mod");
+            addAlert("🧬 THREAT EVOLVED: Malware has mutated. Spread speed increased.");
+            addLog("MALWARE MUTATION: Polymorphic behavior detected. Encryption intensity increased.");
+        }
+
+        if (dataLoss >= 100) { dataLoss = 100; triggerSystemFailure(); }
+        document.getElementById("dataLoss").innerText = Math.floor(dataLoss) + "%";
+    }
+}
+
+function triggerSystemFailure() {
+    systemFailed = true;
+    addLog("CRITICAL FAILURE: Network integrity lost. 100% data encryption confirmed.");
+    document.body.innerHTML = `
+        <div style="background:#440000; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:monospace; text-align:center; padding: 20px;">
+            <h1 style="font-size:60px; color: #ff4444;">SYSTEM COMPROMISED</h1>
+            <p style="font-size:24px;">TOTAL DATA LOSS REACHED</p>
+            <div style="display:flex; gap: 20px;">
+                <button onclick="downloadLogs()" style="padding:15px 30px; background:#0088ff; color:white; border:none; cursor:pointer; font-weight:bold;">DOWNLOAD INCIDENT REPORT</button>
+                <button onclick="location.reload()" style="padding:15px 30px; background:white; color:black; border:none; cursor:pointer; font-weight:bold;">REBOOT SYSTEM</button>
+            </div>
+        </div>
+    `;
+}
+
+function triggerSystemSuccess() {
+    systemFailed = true;
+    addLog("SUCCESS: Threat completely eradicated. All nodes verified sanitized.");
+    document.body.innerHTML = `
+        <div style="background:#003311; color:white; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; font-family:monospace; text-align:center; padding: 20px;">
+            <h1 style="font-size:60px; color: #00ff66;">CONGRATULATIONS</h1>
+            <p style="font-size:24px;">NETWORK FULLY SANITIZED</p>
+            <div style="display:flex; gap: 20px;">
+                <button onclick="downloadLogs()" style="padding:15px 30px; background:#0088ff; color:white; border:none; cursor:pointer; font-weight:bold;">DOWNLOAD INCIDENT REPORT</button>
+                <button onclick="location.reload()" style="padding:15px 30px; background:white; color:black; border:none; cursor:pointer; font-weight:bold;">REBOOT SIMULATION</button>
+            </div>
+        </div>
+    `;
+}
+
+function infect(nodeId, text) {
+    if (systemFailed) return;
+    const node = document.getElementById(nodeId);
+    if (!node.classList.contains('safe')) return;
+    
+    if (!node.dataset.origIcon) node.dataset.origIcon = node.querySelector('.icon').innerText;
+    node.classList.replace('safe', 'warning');
+    addAlert(text);
+    
+    setTimeout(() => {
+        if (node.classList.contains('warning')) {
+            node.classList.remove('warning');
+            node.classList.add(isMutated ? 'mutated' : 'infected'); // Apply mutation visual if active
+            node.querySelector('.icon').innerText = '🔒';
+            infectedCount++; 
+            virusHasHit = true;
+            updateStats();
+            addLog(`INFECTION: ${node.querySelector('.label').innerText} is now encrypted.`);
+
+            if (nodeId === 'n13') {
+                addAlert("❌ CRITICAL: BACKUP DRIVE INFECTED. ALL SAVED DATA LOST!");
+                addLog("CRITICAL: Offline-Backup drive compromised. Last line of defense failed.");
+                dataLoss = 100; updateDataLoss();
+            }
+        }
+    }, 600);
+}
+
+function recoverNode(nodeId) {
+    if (systemFailed) return;
+    if (backupMode && nodeId !== 'n13') { executeBackup(nodeId); return; }
+
+    const node = document.getElementById(nodeId);
+
+    // Idea 5: If mutated, first click only removes mutation
+    if (node.classList.contains('mutated')) {
+        node.classList.replace('mutated', 'infected');
+        addAlert("🧬 Mutation stripped. Sanitize again to clean node.");
+        addLog(`DE-MUTATION: Layer 1 encryption removed from ${node.querySelector('.label').innerText}.`);
+        return;
+    }
+
+    if (node.classList.contains('infected')) {
+        node.classList.replace('infected', 'recovering');
+        setTimeout(() => {
+            node.classList.replace('recovering', 'safe');
+            if (node.dataset.origIcon) node.querySelector('.icon').innerText = node.dataset.origIcon;
+            infectedCount = Math.max(0, infectedCount - 1);
+            updateStats();
+            addAlert(`✅ Sanitized: ${node.querySelector('.label').innerText}`);
+            addLog(`SANITIZATION: ${node.querySelector('.label').innerText} restored to safe state.`);
+        }, 1000);
+    }
+}
+
+function updateStats() {
+    if(systemFailed) return;
+    document.getElementById("infectedCount").innerText = infectedCount;
+    
+    if (virusHasHit && infectedCount === 0) {
+        triggerSystemSuccess();
+        return;
+    }
+
+    const threat = document.getElementById("threat");
+    if (infectedCount >= 8) { threat.innerText = "CRITICAL"; document.body.classList.add("glitch"); }
+    else if (infectedCount >= 4) { threat.innerText = "HIGH"; document.body.classList.remove("glitch"); }
+    else { threat.innerText = "LOW"; document.body.classList.remove("glitch"); }
+}
+
+function addAlert(text) {
+    if(systemFailed) return;
+    const alerts = document.getElementById("alerts");
+    const div = document.createElement("div");
+    div.className = "alert"; div.innerHTML = text;
+    alerts.prepend(div);
+    if(alerts.children.length > 6) alerts.lastChild.remove();
+}
+
+// Idea 6: Incident Logging
+function addLog(msg) {
+    const time = new Date().toLocaleTimeString();
+    logs.push(`[${time}] ${msg}`);
+}
+
+function downloadLogs() {
+    const reportHead = "--- CYBER INCIDENT FORENSIC REPORT ---\nGenerated: " + new Date().toLocaleString() + "\n\n";
+    const blob = new Blob([reportHead + logs.join('\n')], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Cyber_Incident_Log.txt';
+    link.click();
+}
+
+/* NEW INSTRUCTOR PANEL FUNCTIONALITIES */
+function adminForceMutation() {
+    if(systemFailed) return;
+    isMutated = !isMutated;
+    const btn = document.getElementById("mod-mutate");
+    if(isMutated) {
+        btn.classList.add("active-mod");
+        addAlert("🧬 ADMIN OVERRIDE: Forced polymorphic payload mutation.");
+        addLog("INSTRUCTOR COMMAND: Malware code explicitly mutated.");
+        // Swap existing infections to look mutated instantly
+        document.querySelectorAll('.infected').forEach(n => n.classList.replace('infected', 'mutated'));
+    } else {
+        btn.classList.remove("active-mod");
+        addAlert("🧬 ADMIN OVERRIDE: Dynamic signature mutations suppressed.");
+        addLog("INSTRUCTOR COMMAND: Malware rolled back to stable strand.");
+        document.querySelectorAll('.mutated').forEach(n => n.classList.replace('mutated', 'infected'));
+    }
+}
+
+function adminToggleFreeze() {
+    if(systemFailed) return;
+    adminLogicFrozen = !adminLogicFrozen;
+    const btn = document.getElementById("mod-freeze");
+    if(adminLogicFrozen) {
+        btn.classList.add("active-mod");
+        addAlert("❄️ ADMIN OVERRIDE: Network propagation thread suspended.");
+        addLog("INSTRUCTOR COMMAND: Worm execution loops frozen.");
+    } else {
+        btn.classList.remove("active-mod");
+        addAlert("⚡ ADMIN OVERRIDE: Network propagation loops resumed.");
+        addLog("INSTRUCTOR COMMAND: Worm processing active.");
+    }
+}
+
+function adminInstantPurge() {
+    if(systemFailed) return;
+    addAlert("🛡️ ADMIN OVERRIDE: Absolute global logic purge executing...");
+    addLog("INSTRUCTOR COMMAND: Full destructive signature cleanup dispatched.");
+    
+    document.querySelectorAll('.node').forEach(node => {
+        if (node.classList.contains('infected') || node.classList.contains('mutated') || node.classList.contains('warning')) {
+            node.className = "node safe";
+            if (node.dataset.origIcon) node.querySelector('.icon').innerText = node.dataset.origIcon;
+        }
+    });
+    document.querySelectorAll('.line').forEach(l => l.className = "line");
+    infectedCount = 0;
+    updateStats();
+}
+</script>
+
+<div class="admin-terminal-bar">
+    <div class="admin-telemetry">
+        <span class="admin-pulse-indicator"></span>
+        <span class="admin-status-text">AUTH_OK // WELCOME BACK MR FLANAGAN</span>
+        <span class="admin-divider">|</span>
+        <span class="admin-node">NODE: OVERRIDE_MATRIX_CONNECTED</span>
+    </div>
+    
+    <a href="flanagan.html" class="admin-return-btn">
+        <span class="btn-bracket">[</span> RETURN TO COMMAND CENTER <span class="btn-bracket">]</span>
+    </a>
+</div>
+
+<style>
+    /* Pinned Terminal Container */
+    .admin-terminal-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 45px;
+        background: rgba(3, 10, 15, 0.95);
+        border-top: 1px solid #00ffcc;
+        box-shadow: 0 -5px 20px rgba(0, 255, 204, 0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 25px;
+        font-family: 'Courier New', Courier, monospace;
+        z-index: 9999999; /* Ensures it floats above everything else */
+        box-sizing: border-box;
+    }
+
+    /* Telemetry Data Style */
+    .admin-telemetry {
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        color: #88a0b0;
+        letter-spacing: 1px;
+    }
+
+    /* Flashing Status Light */
+    .admin-pulse-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: #00ffcc;
+        border-radius: 50%;
+        margin-right: 12px;
+        box-shadow: 0 0 8px #00ffcc;
+        animation: adminBlink 1.5s infinite;
+    }
+
+    .admin-status-text {
+        color: #ffffff;
+        font-weight: bold;
+        text-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+    }
+
+    .admin-divider {
+        margin: 0 15px;
+        color: #00ffcc;
+        opacity: 0.5;
+    }
+
+    .admin-node {
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    /* Terminal Action Button */
+    .admin-return-btn {
+        color: #00ffcc;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+
+    .btn-bracket {
+        color: #88a0b0;
+        transition: color 0.3s ease;
+    }
+
+    /* Interactive Hover State */
+    .admin-return-btn:hover {
+        color: #ffffff;
+        text-shadow: 0 0 8px #00ffcc;
+        background: rgba(0, 255, 204, 0.1);
+    }
+
+    .admin-return-btn:hover .btn-bracket {
+        color: #00ffcc;
+    }
+
+    /* Keyframe animation for the diagnostic pulse */
+    @keyframes adminBlink {
+        0%, 100% { opacity: 0.3; transform: scale(0.9); }
+        50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 12px #00ffcc; }
+    }
+
+    /* Adjust page body padding automatically so the footer never covers real content */
+    body {
+        padding-bottom: 55px !important;
+    }
+</style>
+</body>
+</html>
