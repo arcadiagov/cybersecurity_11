@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worm Simulation</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            background-color: #0b0b0b;
+            font-family: Consolas, monospace;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Overlay simulation */
+        #overlay {
+            position: fixed;
+            inset: 0;
+            background-color: black;
+            z-index: 9999;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        .terminal {
+            color: #00ff66;
+            font-size: 20px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .warning {
+            color: red;
+            font-size: 28px;
+            margin-bottom: 25px;
+            animation: flash 0.7s infinite;
+        }
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* Main lesson page */
+        .content {
+            display: none;
+            max-width: 1000px;
+            margin: 60px auto;
+            background-color: #151515;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(255,255,255,0.05);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .content h1 {
+            color: #ff5555;
+            font-size: 42px;
+            margin-bottom: 25px;
+        }
+
+        .content p {
+            color: #dddddd;
+            font-size: 21px;
+            line-height: 1.9;
+        }
+
+        .highlight {
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        .links {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: white;
+            background-color: #a30000;
+            padding: 14px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .links a:hover {
+            background-color: #d10000;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+.glitch {
+    animation: glitch 0.15s infinite;
+}
+
+/* Screen shake for “system stress” */
+@keyframes shake {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(2px,-2px); }
+    50% { transform: translate(-2px,2px); }
+    75% { transform: translate(2px,2px); }
+    100% { transform: translate(0,0); }
+}
+
+.shake {
+    animation: shake 0.15s infinite;
+}
+
+/* Scanline effect (old terminal realism) */
+#overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03),
+        rgba(255,255,255,0.03) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+    pointer-events: none;
+}
+
+/* Fake system toast notifications */
+.toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background: #111;
+    border-left: 4px solid red;
+    padding: 12px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 0.4s ease;
+    z-index: 10000;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Fake progress HUD */
+.hud {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 14px;
+    color: #00ff66;
+}
+
+.bar {
+    width: 260px;
+    height: 6px;
+    background: #222;
+    margin-top: 5px;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0%;
+    background: red;
+    animation: fill 10s linear forwards;
+}
+
+@keyframes fill {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+    </style>
+</head>
+<body>
+    <div class="alert" id="alertBox">
+    ⚠ Network anomaly detected
+</div>
+
+    <!-- Fake worm activity overlay -->
+    <div id="overlay">
+<div id="toasts"></div>
+        <div class="warning">
+            SYSTEM COMPROMISED
+        </div>
+
+        <div class="terminal" id="terminal-text">
+Initializing worm payload...
+
+Copying files...
+Injecting malicious code...
+Scanning connected devices...
+Overloading network traffic...
+Deleting temporary files...
+Replicating worm process...
+Accessing local programs...
+Modifying system directories...
+Disabling security protections...
+Corrupting active memory...
+Sending malicious packets...
+Replicating to external devices...
+Flooding server requests...
+Attempting privilege escalation...
+Replicating worm instances...
+Deleting restore points...
+Overloading CPU usage...
+Copying payload to startup folders...
+Compromising connected systems...
+        </div>
+
+    </div>
+
+    <!-- Main educational content -->
+    <div class="content" id="main-content">
+
+        <h1>Worm Malware Explained</h1>
+
+        <p>
+            A <span class="highlight">worm</span> is a type of malware that can rapidly spread and cause severe disruption once installed on a computer or network.
+        </p>
+
+        <p>
+            Worms are capable of copying themselves into other programs and systems automatically, often without the user realizing it.
+        </p>
+
+        <p>
+            They may overload servers, consume large amounts of system resources, spread across networks, and even crash computers or services.
+        </p>
+
+        <p>
+            Worms are commonly spread through phishing emails, infected downloads, malicious advertisements, or unsafe websites.
+        </p>
+
+        <p>
+            Always be cautious before clicking suspicious links or downloading unknown files from the internet.
+        </p>
+
+        <div class="links">
+
+            <a href="v-ware_sim.html">Virus</a>
+
+            <a href="r-ware_sim.html">Ransomware</a>
+
+            <a href="s-ware_sim.html">Spyware</a>
+
+            <a href="network.html">Virus/Worm Network Infection Simulation</a>
+
+            <a href="t-ware_sim.html">Trojan Horse</a>
+
+
+        </div>
+
+        <div class="footer">
+            Cybersecurity Awareness Simulation Project
+        </div>
+
+    </div>
+
+   
+
+  <script>
+
+const overlay = document.getElementById("overlay");
+const main = document.getElementById("main-content");
+const terminal = document.getElementById("terminal-text");
+const toasts = document.getElementById("toasts");
+
+const lines = terminal.innerText.split("\n");
+terminal.innerText = "";
+
+let i = 0;
+
+/* TYPEWRITER (more chaotic realism) */
+function typeLine() {
+
+    if (i < lines.length) {
+        terminal.innerText += lines[i] + "\n";
+        i++;
+
+        // jitter timing = malware-like instability
+        let delay = Math.random() * 250 + 60;
+        setTimeout(typeLine, delay);
+    }
+}
+
+typeLine();
+
+/* REALISTIC SYSTEM TOASTS */
+const messages = [
+    "Network anomaly detected",
+    "Replicating process across system memory",
+    "Suspicious file modification detected",
+    "Background service spawned unexpectedly",
+    "High CPU usage from unknown process",
+    "System registry access attempt detected"
+];
+
+function showToast(text, delay) {
+
+    setTimeout(() => {
+
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerText = text;
+
+        toasts.appendChild(toast);
+
+        setTimeout(() => toast.classList.add("show"), 50);
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
+
+    }, delay);
+}
+
+/* staggered alerts */
+messages.forEach((msg, index) => {
+    showToast(msg, index * 1200 + 2000);
+});
+
+/* escalation shake effect */
+setTimeout(() => {
+    overlay.classList.add("shake");
+}, 4000);
+
+/* fade-out instead of instant kill */
+setTimeout(() => {
+
+    overlay.style.transition = "opacity 2s ease";
+    overlay.style.opacity = "0";
+
+    setTimeout(() => {
+        overlay.style.display = "none";
+        main.style.display = "block";
+    }, 2000);
+
+}, 10000);
+
+</script>
+
+<div class="admin-terminal-bar">
+    <div class="admin-telemetry">
+        <span class="admin-pulse-indicator"></span>
+        <span class="admin-status-text">AUTH_OK // WELCOME BACK MR FLANAGAN</span>
+        <span class="admin-divider">|</span>
+        <span class="admin-node">NODE: OVERRIDE_MATRIX_CONNECTED</span>
+    </div>
+    
+    <a href="flanagan.html" class="admin-return-btn">
+        <span class="btn-bracket">[</span> RETURN TO COMMAND CENTER <span class="btn-bracket">]</span>
+    </a>
+</div>
+
+<style>
+    /* Pinned Terminal Container */
+    .admin-terminal-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 45px;
+        background: rgba(3, 10, 15, 0.95);
+        border-top: 1px solid #00ffcc;
+        box-shadow: 0 -5px 20px rgba(0, 255, 204, 0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 25px;
+        font-family: 'Courier New', Courier, monospace;
+        z-index: 9999999; /* Ensures it floats above everything else */
+        box-sizing: border-box;
+    }
+
+    /* Telemetry Data Style */
+    .admin-telemetry {
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        color: #88a0b0;
+        letter-spacing: 1px;
+    }
+
+    /* Flashing Status Light */
+    .admin-pulse-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: #00ffcc;
+        border-radius: 50%;
+        margin-right: 12px;
+        box-shadow: 0 0 8px #00ffcc;
+        animation: adminBlink 1.5s infinite;
+    }
+
+    .admin-status-text {
+        color: #ffffff;
+        font-weight: bold;
+        text-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+    }
+
+    .admin-divider {
+        margin: 0 15px;
+        color: #00ffcc;
+        opacity: 0.5;
+    }
+
+    .admin-node {
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    /* Terminal Action Button */
+    .admin-return-btn {
+        color: #00ffcc;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+
+    .btn-bracket {
+        color: #88a0b0;
+        transition: color 0.3s ease;
+    }
+
+    /* Interactive Hover State */
+    .admin-return-btn:hover {
+        color: #ffffff;
+        text-shadow: 0 0 8px #00ffcc;
+        background: rgba(0, 255, 204, 0.1);
+    }
+
+    .admin-return-btn:hover .btn-bracket {
+        color: #00ffcc;
+    }
+
+    /* Keyframe animation for the diagnostic pulse */
+    @keyframes adminBlink {
+        0%, 100% { opacity: 0.3; transform: scale(0.9); }
+        50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 12px #00ffcc; }
+    }
+
+    /* Adjust page body padding automatically so the footer never covers real content */
+    body {
+        padding-bottom: 55px !important;
+    }
+</style>
+</body>
+</html>
