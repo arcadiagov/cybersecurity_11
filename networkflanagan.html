@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Network Breach Simulation - Final Edition</title>
     <style>
-        body { margin: 0; background: #050505; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; }
+        body { margin: 0; background: #050505; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; padding-bottom: 45px !important; box-sizing: border-box; }
         body::before { content: ""; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; }
 
         #exploit-beam { position: fixed; top: -100px; left: 180px; width: 3px; height: 120px; background: linear-gradient(to bottom, transparent, #ff0000, #ffffff); box-shadow: 0 0 20px #ff0000; z-index: 1000; display: none; }
@@ -16,7 +16,7 @@
         .overlay-box { width: 90%; max-width: 600px; background: #101010; border: 1px solid #333; border-radius: 12px; padding: 40px; text-align: center; box-shadow: 0 0 40px rgba(255,0,0,0.15); }
         .overlay-box button { margin-top: 25px; padding: 15px 30px; background: #009944; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
-        .hud { position: fixed; top: 0; left: 0; right: 0; height: 90px; background: rgba(0,0,0,0.92); border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-around; z-index: 999; padding-left: 280px; } /* Shifted HUD to clear the new control panel space */
+        .hud { position: fixed; top: 0; left: 0; right: 0; height: 110px; background: rgba(0,0,0,0.92); border-bottom: 1px solid #222; display: flex; align-items: center; justify-content: space-around; z-index: 999; padding-left: 280px; } /* Shifted HUD to clear the new control panel space */
         .hud-buttons { display: flex; gap: 10px; }
         .hud-box { text-align: center; }
         .hud-title { color: #999; font-size: 12px; text-transform: uppercase; }
@@ -64,7 +64,7 @@
             top: 0;
             left: 0;
             width: 260px;
-            height: 90px;
+            height: 110px;
             background: #02070c;
             border-right: 1px solid #00ffcc;
             border-bottom: 1px solid #00ffcc;
@@ -79,22 +79,22 @@
             color: #00ffcc;
             font-weight: bold;
             letter-spacing: 1.5px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
         }
         .panel-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
+            gap: 4px;
         }
         .admin-action-btn {
             background: rgba(0, 255, 204, 0.05);
             border: 1px solid #00ffcc;
             color: #00ffcc;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
-            padding: 6px 4px;
+            padding: 4px 2px;
             border-radius: 3px;
             cursor: pointer;
             text-transform: uppercase;
@@ -112,6 +112,11 @@
             color: #fff;
             box-shadow: 0 0 10px #aa00ff;
         }
+        .admin-action-btn.speed-active {
+            background: #0088ff;
+            border-color: #0088ff;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -120,7 +125,9 @@
     <div class="panel-header">⚡ Override Functions</div>
     <div class="panel-grid">
         <button class="admin-action-btn" id="mod-mutate" onclick="adminForceMutation()">Force Mutation</button>
-        <button class="admin-action-btn" id="mod-freeze" onclick="adminToggleFreeze()">Freeze Logic</button>
+        <button class="admin-action-btn" id="mod-freeze" onclick="adminToggleFreeze()">Pause Logic</button>
+        <button class="admin-action-btn" id="mod-slow" onclick="adminSetSpeed(2000, this)">Speed: 0.5x</button>
+        <button class="admin-action-btn" id="mod-fast" onclick="adminSetSpeed(400, this)">Speed: 2.0x</button>
         <button class="admin-action-btn" style="grid-column: span 2; border-color: #ff4444; color: #ff4444; background: rgba(255,68,68,0.03);" onclick="adminInstantPurge()">Global Malware Purge</button>
     </div>
 </div>
@@ -155,19 +162,19 @@
 </div>
 
 <div class="network">
-    <div class="node safe" id="n1" style="top:150px; left:150px;" onclick="recoverNode('n1')"><div class="popup"></div><div class="icon">💻</div><div class="label">Office-PC-01</div></div>
-    <div class="node safe" id="n2" style="top:150px; left:450px;" onclick="recoverNode('n2')"><div class="popup"></div><div class="icon">🖥️</div><div class="label">Finance-Server</div></div>
-    <div class="node safe" id="n5" style="top:150px; left:750px;" onclick="recoverNode('n5')"><div class="popup"></div><div class="icon">🖥️</div><div class="label">HR-Laptop</div></div>
-    <div class="node safe" id="n9" style="top:150px; left:1050px;" onclick="recoverNode('n9')"><div class="popup"></div><div class="icon">👔</div><div class="label">CEO-Tablet</div></div>
-    <div class="node safe" id="n7" style="top:350px; left:150px;" onclick="recoverNode('n7')"><div class="popup"></div><div class="icon">📡</div><div class="label">Guest-WiFi</div></div>
-    <div class="node safe" id="n3" style="top:350px; left:450px;" onclick="recoverNode('n3')"><div class="popup"></div><div class="icon">📱</div><div class="label">Emp-Phone</div></div>
-    <div class="node safe" id="n4" style="top:350px; left:750px;" onclick="recoverNode('n4')"><div class="popup"></div><div class="icon">☁️</div><div class="label">Cloud-Storage</div></div>
-    <div class="node safe" id="n11" style="top:350px; left:1050px;" onclick="recoverNode('n11')"><div class="popup"></div><div class="icon">📠</div><div class="label">VOIP-Phone</div></div>
-    <div class="node safe" id="n8" style="top:550px; left:150px;" onclick="recoverNode('n8')"><div class="popup"></div><div class="icon">🗄️</div><div class="label">Data-Center</div></div>
-    <div class="node safe" id="n10" style="top:550px; left:450px;" onclick="recoverNode('n10')"><div class="popup"></div><div class="icon">🎥</div><div class="label">Security-Cam</div></div>
-    <div class="node safe" id="n6" style="top:550px; left:750px;" onclick="recoverNode('n6')"><div class="popup"></div><div class="icon">🖨️</div><div class="label">Net-Printer</div></div>
-    <div class="node safe" id="n12" style="top:550px; left:1050px;" onclick="recoverNode('n12')"><div class="popup"></div><div class="icon">💳</div><div class="label">POS-Terminal</div></div>
-    <div class="node safe" id="n13" style="top:250px; left:600px;" onclick="initBackup()"><div class="popup"></div><div class="icon">💾</div><div class="label">Offline-Backup</div></div>
+    <div class="node safe" id="n1" style="top:180px; left:150px;" onclick="recoverNode('n1')"><div class="popup"></div><div class="icon">💻</div><div class="label">Office-PC-01</div></div>
+    <div class="node safe" id="n2" style="top:180px; left:450px;" onclick="recoverNode('n2')"><div class="popup"></div><div class="icon">🖥️</div><div class="label">Finance-Server</div></div>
+    <div class="node safe" id="n5" style="top:180px; left:750px;" onclick="recoverNode('n5')"><div class="popup"></div><div class="icon">🖥️</div><div class="label">HR-Laptop</div></div>
+    <div class="node safe" id="n9" style="top:180px; left:1050px;" onclick="recoverNode('n9')"><div class="popup"></div><div class="icon">👔</div><div class="label">CEO-Tablet</div></div>
+    <div class="node safe" id="n7" style="top:380px; left:150px;" onclick="recoverNode('n7')"><div class="popup"></div><div class="icon">📡</div><div class="label">Guest-WiFi</div></div>
+    <div class="node safe" id="n3" style="top:380px; left:450px;" onclick="recoverNode('n3')"><div class="popup"></div><div class="icon">📱</div><div class="label">Emp-Phone</div></div>
+    <div class="node safe" id="n4" style="top:380px; left:750px;" onclick="recoverNode('n4')"><div class="popup"></div><div class="icon">☁️</div><div class="label">Cloud-Storage</div></div>
+    <div class="node safe" id="n11" style="top:380px; left:1050px;" onclick="recoverNode('n11')"><div class="popup"></div><div class="icon">📠</div><div class="label">VOIP-Phone</div></div>
+    <div class="node safe" id="n8" style="top:580px; left:150px;" onclick="recoverNode('n8')"><div class="popup"></div><div class="icon">🗄️</div><div class="label">Data-Center</div></div>
+    <div class="node safe" id="n10" style="top:580px; left:450px;" onclick="recoverNode('n10')"><div class="popup"></div><div class="icon">🎥</div><div class="label">Security-Cam</div></div>
+    <div class="node safe" id="n6" style="top:580px; left:750px;" onclick="recoverNode('n6')"><div class="popup"></div><div class="icon">🖨️</div><div class="label">Net-Printer</div></div>
+    <div class="node safe" id="n12" style="top:580px; left:1050px;" onclick="recoverNode('n12')"><div class="popup"></div><div class="icon">💳</div><div class="label">POS-Terminal</div></div>
+    <div class="node safe" id="n13" style="top:280px; left:600px;" onclick="initBackup()"><div class="popup"></div><div class="icon">💾</div><div class="label">Offline-Backup</div></div>
 
     <div class="line" id="l1"></div><div class="line" id="l2"></div><div class="line" id="l3"></div>
     <div class="line" id="l4"></div><div class="line" id="l5"></div><div class="line" id="l6"></div>
@@ -189,6 +196,8 @@ let isMutated = false; // Idea 5
 let logs = []; // Idea 6
 let virusHasHit = false;
 let adminLogicFrozen = false; // Admin variable tracker
+let virusSpeedInterval = 800; // Track dynamic simulation thread intervals
+let virusTimerId = null;
 
 const chatSafe = ["Checking email...", "Compiling project...", "Zoom meeting in 5m", "Saving changes...", "Is the internet slow?"];
 const chatInfected = ["MY FILES ARE GONE!", "WHAT IS THIS LOCK?!", "System Error 404", "I CAN'T LOG IN!", "HELP!!"];
@@ -208,10 +217,16 @@ function startSimulation() {
 
     setTimeout(() => {
         infect('n1', "⚠️ Breach detected on Office-PC-01");
-        setInterval(virusLogic, 800);
+        runVirusLogicLoop();
         setInterval(updateDataLoss, 1000);
         setInterval(triggerChat, 3500); // Idea 4
     }, 600);
+}
+
+function runVirusLogicLoop() {
+    if (virusTimerId) clearTimeout(virusTimerId);
+    virusLogic();
+    virusTimerId = setTimeout(runVirusLogicLoop, virusSpeedInterval);
 }
 
 function createLines() {
@@ -328,18 +343,18 @@ function virusLogic() {
         if ((fromNode.classList.contains('infected') || fromNode.classList.contains('mutated')) && toNode.classList.contains('safe')) {
             line.classList.add("active");
             if (isMutated) line.classList.add("mutated-line");
-            setTimeout(() => { if(!networkIsolated && !adminLogicFrozen) infect(toId, `⚠️ Spreading to ${toNode.querySelector('.label').innerText}`); }, 400);
+            setTimeout(() => { if(!networkIsolated && !adminLogicFrozen) infect(toId, `⚠️ Spreading to ${toNode.querySelector('.label').innerText}`); }, virusSpeedInterval / 2);
         } else if ((toNode.classList.contains('infected') || toNode.classList.contains('mutated')) && fromNode.classList.contains('safe')) {
             line.classList.add("active");
             if (isMutated) line.classList.add("mutated-line");
-            setTimeout(() => { if(!networkIsolated && !adminLogicFrozen) infect(fromId, `⚠️ Spreading to ${fromNode.querySelector('.label').innerText}`); }, 400);
+            setTimeout(() => { if(!networkIsolated && !adminLogicFrozen) infect(fromId, `⚠️ Spreading to ${fromNode.querySelector('.label').innerText}`); }, virusSpeedInterval / 2);
         }
     });
 }
 
 function updateDataLoss() {
     if (!networkIsolated && infectedCount > 0 && !systemFailed && !adminLogicFrozen) {
-        dataLoss += infectedCount * (isMutated ? 2.2 : 1.5); 
+        dataLoss += infectedCount * (isMutated ? 2.2 : 1.5) * (800 / virusSpeedInterval); 
         
         // Idea 5: Mutation trigger at 50%
         if (dataLoss >= 50 && !isMutated) {
@@ -409,7 +424,7 @@ function infect(nodeId, text) {
                 dataLoss = 100; updateDataLoss();
             }
         }
-    }, 600);
+    }, virusSpeedInterval / 2);
 }
 
 function recoverNode(nodeId) {
@@ -437,6 +452,15 @@ function recoverNode(nodeId) {
             addLog(`SANITIZATION: ${node.querySelector('.label').innerText} restored to safe state.`);
         }, 1000);
     }
+}
+
+// Global UI telemetry status function
+function updateFooterSpeedText() {
+    let speedTag = "1.0x (Normal)";
+    if (adminLogicFrozen) speedTag = "PAUSED";
+    else if (virusSpeedInterval === 2000) speedTag = "0.5x (Slow)";
+    else if (virusSpeedInterval === 400) speedTag = "2.0x (Fast)";
+    document.getElementById("speedTelemetry").innerText = `SPEED_MULT: ${speedTag}`;
 }
 
 function updateStats() {
@@ -503,12 +527,38 @@ function adminToggleFreeze() {
     const btn = document.getElementById("mod-freeze");
     if(adminLogicFrozen) {
         btn.classList.add("active-mod");
-        addAlert("❄️ ADMIN OVERRIDE: Network propagation thread suspended.");
+        btn.innerText = "Resume Logic";
+        addAlert("❄️ ADMIN OVERRIDE: Simulation loops paused.");
         addLog("INSTRUCTOR COMMAND: Worm execution loops frozen.");
     } else {
         btn.classList.remove("active-mod");
-        addAlert("⚡ ADMIN OVERRIDE: Network propagation loops resumed.");
+        btn.innerText = "Pause Logic";
+        addAlert("⚡ ADMIN OVERRIDE: Simulation loops resumed.");
         addLog("INSTRUCTOR COMMAND: Worm processing active.");
+    }
+    updateFooterSpeedText();
+}
+
+function adminSetSpeed(msInterval, element) {
+    if(systemFailed) return;
+    
+    document.getElementById("mod-slow").classList.remove("speed-active");
+    document.getElementById("mod-fast").classList.remove("speed-active");
+    
+    if (virusSpeedInterval === msInterval) {
+        virusSpeedInterval = 800; // Reset back to baseline normal layout
+        addAlert("⚡ ADMIN OVERRIDE: Propagation velocity reset to normal default.");
+        addLog("INSTRUCTOR COMMAND: Worm execution speed set to 1.0x.");
+    } else {
+        virusSpeedInterval = msInterval;
+        element.classList.add("speed-active");
+        let speedLabel = msInterval === 2000 ? "0.5x" : "2.0x";
+        addAlert(`⚡ ADMIN OVERRIDE: Propagation velocity modulated to ${speedLabel}.`);
+        addLog(`INSTRUCTOR COMMAND: Worm speed adjusted to ${speedLabel}.`);
+    }
+    updateFooterSpeedText();
+    if(!adminLogicFrozen) {
+        runVirusLogicLoop(); // Clear previous interval stacks instantly
     }
 }
 
@@ -535,6 +585,8 @@ function adminInstantPurge() {
         <span class="admin-status-text">AUTH_OK // WELCOME BACK MR FLANAGAN</span>
         <span class="admin-divider">|</span>
         <span class="admin-node">NODE: OVERRIDE_MATRIX_CONNECTED</span>
+        <span class="admin-divider">|</span>
+        <span class="admin-node" id="speedTelemetry" style="color: #00ffcc;">SPEED_MULT: 1.0x (Normal)</span>
     </div>
     
     <a href="flanagan.html" class="admin-return-btn">
@@ -546,9 +598,9 @@ function adminInstantPurge() {
     /* Pinned Terminal Container */
     .admin-terminal-bar {
         position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
         height: 45px;
         background: rgba(3, 10, 15, 0.95);
         border-top: 1px solid #00ffcc;
@@ -558,7 +610,7 @@ function adminInstantPurge() {
         align-items: center;
         padding: 0 25px;
         font-family: 'Courier New', Courier, monospace;
-        z-index: 9999999; /* Ensures it floats above everything else */
+        z-index: 9999999 !important; /* Ensures it floats above everything else */
         box-sizing: border-box;
     }
 
@@ -631,11 +683,6 @@ function adminInstantPurge() {
     @keyframes adminBlink {
         0%, 100% { opacity: 0.3; transform: scale(0.9); }
         50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 12px #00ffcc; }
-    }
-
-    /* Adjust page body padding automatically so the footer never covers real content */
-    body {
-        padding-bottom: 55px !important;
     }
 </style>
 </body>
