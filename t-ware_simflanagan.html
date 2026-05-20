@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CIBC Security Plugin</title>
+
+<link rel="icon" type="image/png" href="favicon.png">
+
+<style>
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f1f3f4;
+    overflow-x: hidden;
+}
+
+/* Gmail Header */
+
+.topbar {
+    background: white;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 25px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+}
+
+.gmail-logo {
+    font-size: 34px;
+    font-weight: bold;
+    color: #d93025;
+}
+
+/* Email */
+
+.email-wrapper {
+    max-width: 900px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 25px rgba(0,0,0,0.08);
+}
+
+.email-header {
+    padding: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.subject {
+    font-size: 30px;
+    margin-bottom: 20px;
+    color: #202124;
+}
+
+.sender {
+    color: #555;
+    line-height: 1.8;
+}
+
+.email-body {
+    padding: 40px;
+    font-size: 18px;
+    line-height: 1.9;
+    color: #222;
+}
+
+.warning-box {
+    background: #fff4f4;
+    border-left: 5px solid #d93025;
+    padding: 20px;
+    margin: 25px 0;
+}
+
+.download-btn {
+    display: inline-block;
+    margin-top: 25px;
+    background: #d93025;
+    color: white;
+    text-decoration: none;
+    padding: 16px 30px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    font-size: 17px;
+}
+
+.download-btn:hover {
+    background: #b71c1c;
+}
+
+/* Download Overlay */
+
+#download-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.96);
+    color: white;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    flex-direction: column;
+}
+
+.download-box {
+    width: 90%;
+    max-width: 700px;
+    background: #101010;
+    padding: 40px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    box-shadow: 0 0 35px rgba(255,0,0,0.15);
+}
+
+.download-title {
+    font-size: 30px;
+    color: #ff5555;
+    margin-bottom: 25px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 28px;
+    background: #222;
+    border-radius: 30px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #1a73e8, #00ff99);
+    transition: width 4s linear;
+}
+
+/* Split Screen */
+
+#simulation-section {
+    display: none;
+    width: 100%;
+    height: 100vh;
+}
+
+.split-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background: #050505;
+}
+
+/* Panels */
+
+.user-view,
+.behind-scenes {
+    flex: 1;
+    padding: 25px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.user-view {
+    background: #f3f3f3;
+    color: black;
+}
+
+.behind-scenes {
+    background: black;
+    border-left: 4px solid red;
+}
+
+/* Titles */
+
+.panel-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.panel-title.red {
+    color: #ff3333;
+}
+
+/* Fake Browser */
+
+.fake-browser {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 25px rgba(0,0,0,0.25);
+}
+
+.browser-top {
+    background: #dddddd;
+    padding: 12px 18px;
+    color: #666;
+    font-size: 18px;
+}
+
+.browser-content {
+    padding: 40px;
+}
+
+.browser-content h2 {
+    margin-top: 0;
+}
+
+.loading-bar {
+    width: 100%;
+    height: 24px;
+    background: #ddd;
+    border-radius: 30px;
+    overflow: hidden;
+    margin-top: 30px;
+}
+
+.loading-fill {
+    width: 65%;
+    height: 100%;
+    background: #1a73e8;
+    animation: slowLoad 4s infinite;
+}
+
+@keyframes slowLoad {
+
+    0% {
+        width: 25%;
+    }
+
+    100% {
+        width: 90%;
+    }
+
+}
+
+/* Console */
+
+.attack-console {
+    color: #00ff66;
+    font-family: Consolas, monospace;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.system-access {
+    margin-bottom: 25px;
+}
+
+.access-label {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.access-bar {
+    width: 100%;
+    height: 28px;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.access-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff0000, #00ff66);
+    transition: width 15s linear;
+}
+
+.trojan-log {
+    font-size: 16px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+.success {
+    color: #00ff66;
+    font-weight: bold;
+    font-size: 22px;
+    margin-top: 18px;
+}
+
+/* Educational Page */
+
+.content {
+    display: none;
+    max-width: 1000px;
+    margin: 60px auto;
+    background-color: #151515;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(255,255,255,0.05);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.content h1 {
+    color: #ff5555;
+    font-size: 42px;
+    margin-bottom: 25px;
+}
+
+.content p {
+    color: #dddddd;
+    font-size: 21px;
+    line-height: 1.9;
+}
+
+.highlight {
+    color: #ff6666;
+    font-weight: bold;
+}
+
+.links {
+    margin-top: 40px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.links a {
+    text-decoration: none;
+    color: white;
+    background-color: #a30000;
+    padding: 14px 24px;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.links a:hover {
+    background-color: #d10000;
+}
+
+.footer {
+    margin-top: 40px;
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+}
+
+/* Glitch */
+
+.screen-flash {
+    animation: flashScreen 0.15s infinite;
+}
+
+@keyframes flashScreen {
+
+    0% {
+        transform: translate(0px,0px);
+    }
+
+    20% {
+        transform: translate(-1px,1px);
+    }
+
+    40% {
+        transform: translate(1px,-1px);
+    }
+
+    60% {
+        transform: translate(-1px,2px);
+    }
+
+    80% {
+        transform: translate(1px,-2px);
+    }
+
+    100% {
+        transform: translate(0px,0px);
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<!-- EMAIL -->
+
+<div id="email-page">
+
+    <div class="topbar">
+
+        <div class="gmail-logo">
+            Gmail
+        </div>
+
+    </div>
+
+    <div class="email-wrapper">
+
+        <div class="email-header">
+
+            <div class="subject">
+                Mandatory Banking Security Plugin
+            </div>
+
+            <div class="sender">
+
+                <strong>CIBC Security Team</strong><br>
+
+                From: no-reply@gmail.com<br>
+
+                To: customer@email.com
+
+            </div>
+
+        </div>
+
+        <div class="email-body">
+
+            <p>Hello Customer,</p>
+
+            <div class="warning-box">
+
+                Due to recent suspicious banking activity, a mandatory security plugin must be installed immediately to continue access to online banking services.
+
+            </div>
+
+            <p>
+                Failure to install the required plugin within 24 hours will result in temporary suspension of all online banking access.
+            </p>
+
+            <p>
+                Please install the secure plugin below to maintain uninterrupted access to your account.
+            </p>
+
+            <button class="download-btn" onclick="startDownload()">
+                Download Security Plugin
+            </button>
+
+            <p style="margin-top:40px;">
+                Thank you,<br>
+                CIBC Fraud Prevention Team
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- DOWNLOAD -->
+
+<div id="download-overlay">
+
+    <div class="download-box">
+
+        <div class="download-title">
+            Downloading Security Plugin...
+        </div>
+
+        <p>
+            Establishing secure encrypted connection...
+        </p>
+
+        <p>
+            Verifying banking protection package...
+        </p>
+
+        <div class="progress-bar">
+
+            <div class="progress-fill" id="progress-fill"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SIMULATION -->
+
+<div id="simulation-section">
+
+    <div class="split-container">
+
+        <!-- USER VIEW -->
+
+        <div class="user-view">
+
+            <div class="panel-title">
+                USER VIEW
+            </div>
+
+            <div class="fake-browser">
+
+                <div class="browser-top">
+                    ● ● ●
+                </div>
+
+                <div class="browser-content">
+
+                    <h2>Security Plugin Installed</h2>
+
+                    <p>
+                        Your SecureAccess banking plugin was installed successfully.
+                    </p>
+
+                    <p>
+                        Please wait while banking services reconnect...
+                    </p>
+
+                    <div class="loading-bar">
+
+                        <div class="loading-fill"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BEHIND THE SCENES -->
+
+        <div class="behind-scenes">
+
+            <div class="panel-title red">
+                BEHIND THE SCENES
+            </div>
+
+            <div class="attack-console">
+
+                <div class="system-access">
+
+                    <div class="access-label">
+                        Gaining SYSTEM access...
+                    </div>
+
+                    <div class="access-bar">
+
+                        <div class="access-fill" id="access-fill"></div>
+
+                    </div>
+
+                </div>
+
+                <div class="trojan-log" id="trojan-log"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- EDUCATIONAL -->
+
+<div id="education-section" class="content">
+
+    <h1>Trojan Horse Malware Explained</h1>
+
+    <p>
+        What you have just experienced is an example of a
+        <span class="highlight">Trojan Horse attack.</span>
+    </p>
+
+    <p>
+        Trojan malware disguises itself as legitimate software in order to trick users into downloading and installing it voluntarily.
+    </p>
+
+    <p>
+        Once installed, a Trojan may secretly gain system access, steal passwords, monitor activity, access banking information, create remote backdoors, or download additional malware onto the computer.
+    </p>
+
+    <p>
+        Unlike worms or viruses, Trojans rely heavily on
+        <span class="highlight">social engineering</span>
+        techniques such as urgency, fear, and pretending to be trusted companies or services.
+    </p>
+
+    <p>
+        In this simulation, the fake email attempted to create urgency by threatening banking access suspension within 24 hours.
+    </p>
+
+    <p>
+        Always verify email senders, avoid downloading attachments from suspicious emails, and contact organizations directly before installing unknown software.
+    </p>
+
+    <!-- LINKS -->
+
+    <div class="links">
+
+        <a href="v-ware_sim.html">Virus</a>
+
+        <a href="r-ware_sim.html">Ransomware</a>
+
+        <a href="s-ware_sim.html">Spyware</a>
+
+        <a href="w-ware_sim.html">Worm</a>
+
+
+    </div>
+
+    <div class="footer">
+        Cybersecurity Awareness Simulation Project
+    </div>
+
+</div>
+
+<script>
+
+function startDownload() {
+
+    document.getElementById("download-overlay")
+        .style.display = "flex";
+
+    setTimeout(() => {
+
+        document.getElementById("progress-fill")
+            .style.width = "100%";
+
+    }, 100);
+
+    setTimeout(() => {
+
+        document.getElementById("download-overlay")
+            .style.display = "none";
+
+    }, 4000);
+
+    setTimeout(() => {
+
+        document.getElementById("email-page")
+            .style.display = "none";
+
+        document.getElementById("simulation-section")
+            .style.display = "block";
+
+        startTrojanSimulation();
+
+    }, 8000);
+
+}
+
+const logs = [
+
+"[INFO] Establishing encrypted outbound tunnel...",
+"[INFO] Downloading hidden payload package...",
+"[WARNING] Antivirus service response delayed...",
+"[INFO] Injecting persistence module...",
+"[INFO] Windows Defender exclusions modified...",
+"[INFO] Banking session cookies extracted...",
+"[INFO] Browser autofill credentials copied...",
+"[INFO] Clipboard monitoring enabled...",
+"[INFO] Enumerating local administrator accounts...",
+"[INFO] Uploading saved passwords...",
+"[INFO] Capturing banking session tokens...",
+"[WARNING] Firewall heuristic scan bypassed...",
+"[INFO] Remote desktop backdoor initialized...",
+"[INFO] Webcam permission escalation attempted...",
+"[INFO] Active browser sessions mirrored...",
+"[INFO] Local network devices mapped...",
+"[INFO] SMB propagation prepared...",
+"[INFO] Cryptocurrency wallet scan completed...",
+"[INFO] Outlook mailbox access granted...",
+"[INFO] Uploading sensitive financial documents...",
+"[INFO] Persistence task registered in startup...",
+"[INFO] Hidden administrator account created...",
+"[INFO] Command & Control heartbeat confirmed...",
+"[INFO] Data exfiltration in progress...",
+"[WARNING] Security monitoring partially disabled...",
+"[INFO] SYSTEM privileges acquired..."
+
+];
+
+let index = 0;
+
+function startTrojanSimulation() {
+
+    const logBox =
+        document.getElementById("trojan-log");
+
+    const accessFill =
+        document.getElementById("access-fill");
+
+    accessFill.style.width = "100%";
+
+    document.body.classList.add("screen-flash");
+
+    const interval = setInterval(() => {
+
+        if(index < logs.length) {
+
+            const line =
+                document.createElement("div");
+
+            line.textContent =
+                logs[index];
+
+            logBox.prepend(line);
+
+            index++;
+
+        }
+
+    }, 500);
+
+    setTimeout(() => {
+
+        clearInterval(interval);
+
+        const success =
+            document.createElement("div");
+
+        success.className = "success";
+
+        success.innerHTML =
+            "SYSTEM ACCESS GAINED — BEGIN REMOTE ACCESS";
+
+        logBox.prepend(success);
+
+    }, 15000);
+
+    setTimeout(() => {
+
+        document.getElementById("simulation-section")
+            .style.display = "none";
+
+        document.getElementById("education-section")
+            .style.display = "block";
+
+        document.body.classList.remove("screen-flash");
+
+    }, 15000);
+
+}
+
+window.onload = () => {
+
+    index = 0;
+
+};
+
+</script>
+<div class="admin-terminal-bar">
+    <div class="admin-telemetry">
+        <span class="admin-pulse-indicator"></span>
+        <span class="admin-status-text">AUTH_OK // WELCOME BACK MR FLANAGAN</span>
+        <span class="admin-divider">|</span>
+        <span class="admin-node">NODE: OVERRIDE_MATRIX_CONNECTED</span>
+    </div>
+    
+    <a href="flanagan.html" class="admin-return-btn">
+        <span class="btn-bracket">[</span> RETURN TO COMMAND CENTER <span class="btn-bracket">]</span>
+    </a>
+</div>
+
+<style>
+    /* Pinned Terminal Container */
+    .admin-terminal-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 45px;
+        background: rgba(3, 10, 15, 0.95);
+        border-top: 1px solid #00ffcc;
+        box-shadow: 0 -5px 20px rgba(0, 255, 204, 0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 25px;
+        font-family: 'Courier New', Courier, monospace;
+        z-index: 9999999; /* Ensures it floats above everything else */
+        box-sizing: border-box;
+    }
+
+    /* Telemetry Data Style */
+    .admin-telemetry {
+        display: flex;
+        align-items: center;
+        font-size: 13px;
+        color: #88a0b0;
+        letter-spacing: 1px;
+    }
+
+    /* Flashing Status Light */
+    .admin-pulse-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: #00ffcc;
+        border-radius: 50%;
+        margin-right: 12px;
+        box-shadow: 0 0 8px #00ffcc;
+        animation: adminBlink 1.5s infinite;
+    }
+
+    .admin-status-text {
+        color: #ffffff;
+        font-weight: bold;
+        text-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+    }
+
+    .admin-divider {
+        margin: 0 15px;
+        color: #00ffcc;
+        opacity: 0.5;
+    }
+
+    .admin-node {
+        font-size: 11px;
+        opacity: 0.7;
+    }
+
+    /* Terminal Action Button */
+    .admin-return-btn {
+        color: #00ffcc;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        padding: 5px 10px;
+        border-radius: 3px;
+    }
+
+    .btn-bracket {
+        color: #88a0b0;
+        transition: color 0.3s ease;
+    }
+
+    /* Interactive Hover State */
+    .admin-return-btn:hover {
+        color: #ffffff;
+        text-shadow: 0 0 8px #00ffcc;
+        background: rgba(0, 255, 204, 0.1);
+    }
+
+    .admin-return-btn:hover .btn-bracket {
+        color: #00ffcc;
+    }
+
+    /* Keyframe animation for the diagnostic pulse */
+    @keyframes adminBlink {
+        0%, 100% { opacity: 0.3; transform: scale(0.9); }
+        50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 12px #00ffcc; }
+    }
+
+    /* Adjust page body padding automatically so the footer never covers real content */
+    body {
+        padding-bottom: 55px !important;
+    }
+</style>
+</body>
+</html>
