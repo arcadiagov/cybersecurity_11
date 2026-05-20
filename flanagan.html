@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center - Mr. Flanagan Access</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #060a0f;
+            color: #00ffcc;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+        }
+
+        /* Tech Grid Background */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 255, 204, 0.02) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(0, 255, 204, 0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Scanline Overlay Effect */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 99999;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        .command-container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Header Style */
+        header {
+            border: 1px solid #00ffcc;
+            background: rgba(10, 20, 30, 0.85);
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.15);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            margin: 0 0 5px 0;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 0 10px #00ffcc;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(0, 255, 102, 0.2);
+            border: 1px solid #00ff66;
+            color: #00ff66;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 3px;
+            animation: pulse 2s infinite;
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: 14px;
+            color: #88a0b0;
+        }
+
+        /* Message Box */
+        .welcome-message-box {
+            border-left: 4px solid #00ffcc;
+            background: rgba(0, 255, 204, 0.04);
+            padding: 25px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-size: 18px;
+        }
+
+        .welcome-message-box p {
+            margin: 0 0 15px 0;
+        }
+        
+        .welcome-message-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight-text {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        /* Grid Dashboard Layout */
+        .matrix-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            color: #88a0b0;
+            border-bottom: 1px dashed #00ffcc;
+            padding-bottom: 5px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        /* Command Button Cards */
+        .command-card {
+            background: rgba(6, 15, 25, 0.9);
+            border: 1px solid #00ffcc;
+            border-radius: 6px;
+            padding: 20px;
+            text-decoration: none;
+            color: #00ffcc;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 255, 204, 0.05);
+        }
+
+        .command-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: #00ffcc;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+
+        .command-card:hover {
+            background: rgba(0, 255, 204, 0.08);
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            transform: translateY(-3px);
+            color: #ffffff;
+        }
+
+        .command-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-meta {
+            font-size: 11px;
+            color: #88a0b0;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .action-indicator {
+            font-size: 13px;
+            text-align: right;
+            font-weight: bold;
+            color: #00ffcc;
+        }
+        
+        .command-card:hover .action-indicator {
+            color: #ffffff;
+        }
+
+        /* Specialized Styling for core navigation */
+        .card-root {
+            border-color: #ff9900;
+            background: rgba(255, 153, 0, 0.02);
+        }
+        .card-root .action-indicator { color: #ff9900; }
+        .card-root::before { background: #ff9900; }
+        .card-root:hover {
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 153, 0, 0.3);
+            background: rgba(255, 153, 0, 0.08);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #4a6070;
+            border-top: 1px solid rgba(0, 255, 204, 0.1);
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="command-container">
+
+    <header>
+        <div class="header-left">
+            <h1>Instructor Override Terminal</h1>
+            <span class="status-badge">SECURE CONNECTION ACTIVE</span>
+        </div>
+        <div class="header-right">
+            <div>SYSTEM: ONLINE</div>
+            <div id="live-timestamp">LOADING TIMESTAMP...</div>
+        </div>
+    </header>
+
+    <div class="welcome-message-box">
+        <p class="highlight-text">Hi Mr Flanagan!</p>
+        <p>
+            The coding of this website was created with assistance from Gemini AI and ChatGPT, but the ideas and the text on the pages were written by me. 
+        </p>
+        <p>
+            I hope you enjoy this website and project!
+        </p>
+    </div>
+
+    <div class="matrix-title">System Portals</div>
+    <div class="dashboard-grid" style="margin-bottom: 35px;">
+        
+        <a href="index.html" class="command-card card-root">
+            <div>
+                <div class="card-meta">PORTAL_01 // ENVIRONMENT ENTRY</div>
+                <div class="card-title">🏠 Start Page</div>
+            </div>
+            <div class="action-indicator">EXECUTE_INITIAL_MAIN ></div>
+        </a>
+
+        <a href="phishing_explination.html" class="command-card card-root">
+            <div>
+                <div class="card-meta">PORTAL_02 // COMPREHENSION MODEL</div>
+                <div class="card-title">🔍 Phishing Explanation</div>
+            </div>
+            <div class="action-indicator">LAUNCH_LECTURE_DATA ></div>
+        </a>
+
+        <a href="network.html" class="command-card card-root">
+            <div>
+                <div class="card-meta">PORTAL_03 // GRAPHICAL SIMULATOR</div>
+                <div class="card-title">🌐 Network Infection Simulation</div>
+            </div>
+            <div class="action-indicator">START_LIVE_MAP_SANDBOX ></div>
+        </a>
+
+    </div>
+
+    <div class="matrix-title">Malware Simulation Engines</div>
+    <div class="dashboard-grid">
+
+        <a href="v-ware_sim.html" class="command-card">
+            <div>
+                <div class="card-meta">ENGINE_01 // SELF_REPLICATING</div>
+                <div class="card-title">🦠 Virus Simulation</div>
+            </div>
+            <div class="action-indicator">DEPLOY_PAYLOAD ></div>
+        </a>
+
+        <a href="w-ware_sim.html" class="command-card">
+            <div>
+                <div class="card-meta">ENGINE_02 // NETWORK_BREACH</div>
+                <div class="card-title">🪱 Worm Simulation</div>
+            </div>
+            <div class="action-indicator">DEPLOY_PAYLOAD ></div>
+        </a>
+
+        <a href="r-ware_sim.html" class="command-card">
+            <div>
+                <div class="card-meta">ENGINE_03 // ENCRYPTION_LOCK</div>
+                <div class="card-title">🔒 Ransomware Simulation</div>
+            </div>
+            <div class="action-indicator">DEPLOY_PAYLOAD ></div>
+        </a>
+
+        <a href="t-ware_sim.html" class="command-card">
+            <div>
+                <div class="card-meta">ENGINE_04 // MALICIOUS_DISGUISE</div>
+                <div class="card-title">🐴 Trojan Horse Simulation</div>
+            </div>
+            <div class="action-indicator">DEPLOY_PAYLOAD ></div>
+        </a>
+
+        <a href="s-ware_sim.html" class="command-card">
+            <div>
+                <div class="card-meta">ENGINE_05 // DATA_EXFILTRATION</div>
+                <div class="card-title">👁️ Spyware Simulation</div>
+            </div>
+            <div class="action-indicator">DEPLOY_PAYLOAD ></div>
+        </a>
+
+    </div>
+
+    <footer>
+        COMP-SEC ACADEMIC DASHBOARD // MANDATORY LAB INFRASTRUCTURE // UNAUTHORIZED ACCESS PROHIBITED
+    </footer>
+
+</div>
+
+<script>
+    // Live terminal clock updater
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        const dateString = now.toLocaleDateString();
+        document.getElementById('live-timestamp').innerText = `${dateString} // ${timeString}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
+
+</body>
+</html>
